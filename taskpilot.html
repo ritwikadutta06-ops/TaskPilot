@@ -1,0 +1,2684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TaskPilot — AI Time Management for IT Professionals</title>
+<meta name="description" content="TaskPilot is an AI-powered time management tool built for IT professionals. Organize tasks, generate smart schedules, detect overload, and boost productivity."/>
+<meta name="keywords" content="task management, time management, AI schedule, IT productivity, developer tools, work planner"/>
+<meta name="author" content="TaskPilot"/>
+<meta name="theme-color" content="#0a0d14"/>
+
+<!-- Open Graph / Social sharing -->
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="TaskPilot — AI Time Management for IT Professionals"/>
+<meta property="og:description" content="Stop planning manually. TaskPilot uses AI to generate your optimal daily schedule, detect overload, and keep you on track."/>
+<meta property="og:image" content="https://og-image-placeholder.vercel.app/TaskPilot.png"/>
+<meta property="og:url" content="https://taskpilot.app"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="TaskPilot — AI Schedule Generator"/>
+<meta name="twitter:description" content="AI-powered daily scheduling for IT professionals. Free to use."/>
+
+<!-- PWA -->
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="TaskPilot"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233b82f6'/><text y='.9em' font-size='75' x='12'>✈</text></svg>"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0d14;
+    --bg2: #0f1320;
+    --bg3: #141826;
+    --card: #161c2e;
+    --card2: #1b2235;
+    --border: #232b42;
+    --border2: #2a3350;
+    --accent: #3b82f6;
+    --accent2: #6366f1;
+    --accent3: #22d3ee;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --purple: #a78bfa;
+    --text: #e8eaf2;
+    --text2: #8b93b0;
+    --text3: #5a6282;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --glow: 0 0 30px rgba(59,130,246,0.15);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  /* ─── LAYOUT ─── */
+  .app { display: flex; min-height: 100vh; }
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    width: 240px; min-width: 240px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    padding: 0;
+    position: fixed; top: 0; left: 0; height: 100vh;
+    z-index: 100;
+    transition: transform 0.3s ease;
+  }
+  .sidebar-logo {
+    padding: 22px 22px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+    box-shadow: 0 0 16px rgba(99,102,241,0.4);
+  }
+  .logo-text { font-family: var(--font-head); font-size: 19px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo-text span { color: var(--accent); }
+  .sidebar-nav { padding: 16px 12px; flex: 1; }
+  .nav-section-title {
+    font-size: 10px; font-weight: 600; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--text3);
+    padding: 0 10px; margin: 16px 0 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 9px 12px; border-radius: var(--radius-sm);
+    cursor: pointer; transition: all 0.2s;
+    color: var(--text2); font-size: 14px; font-weight: 400;
+    position: relative; user-select: none;
+  }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active {
+    background: rgba(59,130,246,0.12);
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .nav-item.active::before {
+    content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+    width: 3px; height: 20px; background: var(--accent); border-radius: 0 2px 2px 0;
+  }
+  .nav-badge {
+    margin-left: auto; background: var(--red);
+    color: #fff; font-size: 10px; font-weight: 700;
+    padding: 1px 6px; border-radius: 10px; min-width: 18px; text-align: center;
+  }
+  .nav-badge.yellow { background: var(--yellow); color: #000; }
+  .nav-badge.green { background: var(--green); }
+  .sidebar-bottom {
+    padding: 14px 12px;
+    border-top: 1px solid var(--border);
+  }
+  .user-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: var(--radius-sm);
+    background: var(--bg3); cursor: pointer;
+    transition: background 0.2s;
+  }
+  .user-card:hover { background: var(--card); }
+  .user-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #3b82f6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .user-info { flex: 1; min-width: 0; }
+  .user-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-role { font-size: 11px; color: var(--text3); }
+  /* ─── MAIN ─── */
+  .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  /* ─── TOPBAR ─── */
+  .topbar {
+    height: 60px; background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px; position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-title { font-family: var(--font-head); font-size: 18px; font-weight: 700; }
+  .topbar-date { color: var(--text3); font-size: 13px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: var(--radius-sm);
+    background: var(--bg3); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; color: var(--text2);
+    font-size: 16px; position: relative;
+  }
+  .icon-btn:hover { background: var(--card); color: var(--text); border-color: var(--border2); }
+  .notif-dot {
+    position: absolute; top: 7px; right: 7px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--red); border: 1px solid var(--bg2);
+  }
+  /* ─── PAGE CONTENT ─── */
+  .page { padding: 28px; display: none; animation: fadeIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  /* ─── GRID ─── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-family: var(--font-head); font-size: 14px; font-weight: 600;
+    color: var(--text); letter-spacing: 0.2px;
+  }
+  .card-action {
+    font-size: 12px; color: var(--accent); cursor: pointer;
+    padding: 4px 10px; border-radius: 6px;
+    background: rgba(59,130,246,0.1);
+    transition: background 0.2s;
+  }
+  .card-action:hover { background: rgba(59,130,246,0.2); }
+  /* ─── STAT CARDS ─── */
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex; flex-direction: column; gap: 10px;
+    transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .stat-card.blue::before { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .stat-card.green::before { background: linear-gradient(90deg, var(--green), #34d399); }
+  .stat-card.yellow::before { background: linear-gradient(90deg, var(--yellow), #fcd34d); }
+  .stat-card.red::before { background: linear-gradient(90deg, var(--red), #f87171); }
+  .stat-card:hover { border-color: var(--border2); transform: translateY(-1px); box-shadow: var(--shadow); }
+  .stat-top { display: flex; align-items: center; justify-content: space-between; }
+  .stat-icon { font-size: 20px; }
+  .stat-trend { font-size: 11px; padding: 2px 7px; border-radius: 20px; font-weight: 500; }
+  .stat-trend.up { background: rgba(16,185,129,0.12); color: var(--green); }
+  .stat-trend.down { background: rgba(239,68,68,0.12); color: var(--red); }
+  .stat-value { font-family: var(--font-head); font-size: 28px; font-weight: 700; line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--text3); }
+  /* ─── BUTTONS ─── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px; border-radius: var(--radius-sm);
+    font-family: var(--font-body); font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; border: none; outline: none;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(99,102,241,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,0.45); }
+  .btn-secondary {
+    background: var(--bg3); color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--card); border-color: var(--border2); }
+  .btn-ghost { background: transparent; color: var(--text2); }
+  .btn-ghost:hover { background: var(--bg3); color: var(--text); }
+  .btn-danger { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+  .btn-danger:hover { background: rgba(239,68,68,0.2); }
+  .btn-sm { padding: 6px 12px; font-size: 13px; }
+  .btn-full { width: 100%; justify-content: center; }
+  /* ─── INPUTS ─── */
+  .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .input-label { font-size: 12px; font-weight: 500; color: var(--text2); }
+  .input, .select, .textarea {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: var(--font-body); font-size: 14px;
+    padding: 9px 12px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+  .input:focus, .select:focus, .textarea:focus {
+    border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+  }
+  .textarea { resize: vertical; min-height: 80px; }
+  .select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b93b0' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; }
+  .select option { background: var(--bg2); }
+  /* ─── TASK ITEMS ─── */
+  .task-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 13px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg3); margin-bottom: 9px;
+    transition: all 0.2s; cursor: pointer;
+  }
+  .task-item:hover { border-color: var(--border2); background: var(--card2); }
+  .task-check {
+    width: 18px; height: 18px; border-radius: 5px; flex-shrink: 0;
+    border: 2px solid var(--border2); cursor: pointer; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; background: transparent;
+  }
+  .task-check.done { background: var(--green); border-color: var(--green); }
+  .task-check.done::after { content: '✓'; color: #fff; font-size: 10px; font-weight: 700; }
+  .task-body { flex: 1; min-width: 0; }
+  .task-name { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+  .task-name.done { text-decoration: line-through; color: var(--text3); }
+  .task-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11px; padding: 2px 8px; border-radius: 20px;
+    font-weight: 500; white-space: nowrap;
+  }
+  .tag-high { background: rgba(239,68,68,0.12); color: var(--red); }
+  .tag-medium { background: rgba(245,158,11,0.12); color: var(--yellow); }
+  .tag-low { background: rgba(16,185,129,0.12); color: var(--green); }
+  .tag-blue { background: rgba(59,130,246,0.12); color: var(--accent); }
+  .tag-purple { background: rgba(167,139,250,0.12); color: var(--purple); }
+  .task-deadline { font-size: 11px; color: var(--text3); }
+  .task-actions { display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
+  .task-item:hover .task-actions { opacity: 1; }
+  /* ─── PRIORITY BADGE ─── */
+  .priority-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px;
+  }
+  .priority-dot.high { background: var(--red); box-shadow: 0 0 6px rgba(239,68,68,0.5); }
+  .priority-dot.medium { background: var(--yellow); box-shadow: 0 0 6px rgba(245,158,11,0.5); }
+  .priority-dot.low { background: var(--green); box-shadow: 0 0 6px rgba(16,185,129,0.5); }
+  /* ─── PROGRESS BAR ─── */
+  .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+  .progress-fill.blue { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .progress-fill.green { background: linear-gradient(90deg, var(--green), #34d399); }
+  .progress-fill.yellow { background: linear-gradient(90deg, var(--yellow), #fcd34d); }
+  .progress-fill.red { background: linear-gradient(90deg, var(--red), #f87171); }
+  /* ─── ALERT BANNER ─── */
+  .alert {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 13px 16px; border-radius: var(--radius-sm);
+    margin-bottom: 12px; border: 1px solid;
+  }
+  .alert.red { background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.2); }
+  .alert.yellow { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.2); }
+  .alert.blue { background: rgba(59,130,246,0.06); border-color: rgba(59,130,246,0.2); }
+  .alert.green { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.2); }
+  .alert-icon { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+  .alert-content { flex: 1; }
+  .alert-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .alert-desc { font-size: 12px; color: var(--text2); }
+  .alert-close { cursor: pointer; color: var(--text3); font-size: 16px; padding: 0 4px; }
+  /* ─── SCHEDULE BLOCKS ─── */
+  .schedule-block {
+    display: flex; align-items: stretch; gap: 0;
+    margin-bottom: 6px; border-radius: var(--radius-sm); overflow: hidden;
+    border: 1px solid var(--border); transition: border-color 0.2s;
+  }
+  .schedule-block:hover { border-color: var(--border2); }
+  .schedule-time {
+    width: 68px; flex-shrink: 0; background: var(--bg3);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 10px 6px; font-size: 11px; color: var(--text3); border-right: 1px solid var(--border);
+  }
+  .schedule-time-main { font-size: 13px; font-weight: 600; color: var(--text2); }
+  .schedule-body {
+    flex: 1; padding: 10px 14px; background: var(--bg3);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .schedule-left { display: flex; align-items: center; gap: 10px; }
+  .schedule-color { width: 4px; border-radius: 2px; align-self: stretch; min-height: 24px; }
+  .schedule-info .sched-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .schedule-info .sched-dur { font-size: 11px; color: var(--text3); }
+  /* ─── ANALYTICS BARS ─── */
+  .analytics-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .analytics-label { font-size: 12px; color: var(--text2); width: 120px; flex-shrink: 0; }
+  .analytics-bar { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .analytics-fill { height: 100%; border-radius: 4px; }
+  .analytics-value { font-size: 12px; color: var(--text2); width: 40px; text-align: right; flex-shrink: 0; }
+  /* ─── FEED ITEMS ─── */
+  .feed-item {
+    display: flex; gap: 14px; padding: 14px 0;
+    border-bottom: 1px solid var(--border); transition: all 0.2s;
+  }
+  .feed-item:last-child { border-bottom: none; }
+  .feed-icon {
+    width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+  }
+  .feed-content .feed-title { font-size: 13px; font-weight: 500; margin-bottom: 3px; line-height: 1.4; }
+  .feed-content .feed-meta { display: flex; align-items: center; gap: 8px; }
+  .feed-content .feed-time { font-size: 11px; color: var(--text3); }
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px); z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: var(--card); border: 1px solid var(--border2);
+    border-radius: 18px; padding: 26px 28px; width: 480px; max-width: calc(100vw - 32px);
+    max-height: 90vh; overflow-y: auto;
+    transform: scale(0.95) translateY(10px); transition: transform 0.25s;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  }
+  .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .modal-title { font-family: var(--font-head); font-size: 18px; font-weight: 700; }
+  .modal-close { cursor: pointer; color: var(--text3); font-size: 20px; padding: 4px; transition: color 0.2s; }
+  .modal-close:hover { color: var(--text); }
+  /* ─── AI RESPONSE ─── */
+  .ai-response {
+    background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(59,130,246,0.06));
+    border: 1px solid rgba(99,102,241,0.25);
+    border-radius: var(--radius); padding: 18px;
+    position: relative; overflow: hidden;
+  }
+  .ai-response::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), transparent);
+  }
+  .ai-label {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 11px; font-weight: 600; color: var(--accent2);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+  }
+  .ai-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+  .ai-text { font-size: 14px; line-height: 1.65; color: var(--text); }
+  /* ─── SPINNER ─── */
+  .spinner {
+    width: 24px; height: 24px; border: 2px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.7s linear infinite; display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    text-align: center; padding: 40px 20px;
+    color: var(--text3);
+  }
+  .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state .empty-text { font-size: 14px; margin-bottom: 14px; }
+  /* ─── DONUT CHART PLACEHOLDER ─── */
+  .donut-wrap { display: flex; align-items: center; gap: 24px; }
+  .donut-svg { flex-shrink: 0; }
+  .donut-legend { display: flex; flex-direction: column; gap: 8px; }
+  .legend-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  /* ─── NOTIFICATION PANEL ─── */
+  .notif-panel {
+    position: fixed; top: 60px; right: 0;
+    width: 320px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 14px 0 0 14px;
+    box-shadow: -8px 8px 40px rgba(0,0,0,0.4);
+    z-index: 90; transform: translateX(100%); transition: transform 0.3s ease;
+    max-height: calc(100vh - 60px); overflow-y: auto;
+  }
+  .notif-panel.open { transform: translateX(0); }
+  .notif-panel-header {
+    padding: 16px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; background: var(--card); z-index: 1;
+  }
+  .notif-item {
+    padding: 13px 18px; border-bottom: 1px solid var(--border);
+    display: flex; gap: 12px; transition: background 0.2s;
+  }
+  .notif-item:hover { background: var(--bg3); }
+  .notif-item.unread { background: rgba(59,130,246,0.04); }
+  .notif-item-icon { width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+  .notif-item-body .notif-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .notif-item-body .notif-time { font-size: 11px; color: var(--text3); }
+  /* ─── AUTH PAGE ─── */
+  .auth-page {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: var(--bg);
+    background-image: radial-gradient(ellipse at 30% 20%, rgba(99,102,241,0.08) 0%, transparent 50%),
+                      radial-gradient(ellipse at 70% 80%, rgba(59,130,246,0.06) 0%, transparent 50%);
+  }
+  .auth-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 36px 40px; width: 420px; max-width: calc(100vw - 32px);
+    box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+  }
+  .auth-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+  .auth-title { font-family: var(--font-head); font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .auth-sub { font-size: 14px; color: var(--text3); margin-bottom: 24px; }
+  .auth-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: var(--text3); font-size: 12px; }
+  .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .auth-switch { text-align: center; font-size: 13px; color: var(--text3); margin-top: 16px; }
+  .auth-switch span { color: var(--accent); cursor: pointer; font-weight: 500; }
+  .auth-switch span:hover { text-decoration: underline; }
+  /* ─── TIME BLOCKS ─── */
+  .time-grid { position: relative; }
+  .time-now-line {
+    position: absolute; left: 68px; right: 0;
+    height: 2px; background: var(--red);
+    z-index: 5;
+  }
+  .time-now-line::before {
+    content: ''; position: absolute; left: -4px; top: -4px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--red); box-shadow: 0 0 8px rgba(239,68,68,0.6);
+  }
+  /* ─── TOGGLE ─── */
+  .toggle-group {
+    display: flex; background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 3px; gap: 2px;
+  }
+  .toggle-btn {
+    padding: 5px 14px; border-radius: 5px; font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; color: var(--text3);
+  }
+  .toggle-btn.active { background: var(--accent); color: #fff; }
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 700px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .grid-4 { grid-template-columns: 1fr; }
+    .topbar { padding: 0 16px; }
+    .page { padding: 16px; }
+  }
+  /* ─── TASK DETAIL MODAL ─── */
+  .detail-modal {
+    background: var(--card); border: 1px solid var(--border2);
+    border-radius: 18px; padding: 26px 28px; width: 520px; max-width: calc(100vw - 32px);
+    max-height: 90vh; overflow-y: auto;
+    transform: scale(0.95) translateY(10px); transition: transform 0.25s;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  }
+  .modal-overlay.open .detail-modal { transform: scale(1) translateY(0); }
+  .detail-section { margin-bottom: 18px; }
+  .detail-section-title { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .detail-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--bg3); border-radius: var(--radius-sm); margin-bottom: 6px; }
+  .detail-row-label { font-size: 12px; color: var(--text3); width: 90px; flex-shrink: 0; }
+  .detail-row-value { font-size: 13px; font-weight: 500; }
+  .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .status-pending { background: rgba(245,158,11,0.12); color: var(--yellow); }
+  .status-done { background: rgba(16,185,129,0.12); color: var(--green); }
+  .status-overdue { background: rgba(239,68,68,0.12); color: var(--red); }
+  .schedule-block { cursor: pointer; }
+  .schedule-block:hover .sched-name { color: var(--accent); }
+  /* ─── MISC ─── */
+  .section-title {
+    font-family: var(--font-head); font-size: 16px; font-weight: 700;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .divider { height: 1px; background: var(--border); margin: 18px 0; }
+  .flex { display: flex; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+  .gap-8 { gap: 8px; }
+  .gap-12 { gap: 12px; }
+  .gap-16 { gap: 16px; }
+  .mb-4 { margin-bottom: 4px; }
+  .mb-8 { margin-bottom: 8px; }
+  .mb-16 { margin-bottom: 16px; }
+  .mb-20 { margin-bottom: 20px; }
+  .text-sm { font-size: 12px; }
+  .text-muted { color: var(--text3); }
+  .text-accent { color: var(--accent); }
+  .text-green { color: var(--green); }
+  .text-yellow { color: var(--yellow); }
+  .text-red { color: var(--red); }
+  .font-head { font-family: var(--font-head); }
+  .fw-600 { font-weight: 600; }
+  .fw-700 { font-weight: 700; }
+  .col-span-2 { grid-column: span 2; }
+  /* hamburger */
+  .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
+  .hamburger span { width: 20px; height: 2px; background: var(--text2); border-radius: 1px; transition: all 0.2s; }
+  @media (max-width: 700px) { .hamburger { display: flex; } }
+  .overlay-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+  .overlay-bg.open { display: block; }
+  /* Animate number */
+  @keyframes countUp { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  .count-anim { animation: countUp 0.5s ease forwards; }
+  /* Wave bg */
+  .hero-bg {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    overflow: hidden; pointer-events: none; z-index: 0;
+  }
+  .hero-bg-circle {
+    position: absolute; border-radius: 50%;
+    filter: blur(80px); opacity: 0.06;
+  }
+  /* ─── LANDING PAGE ─── */
+  .landing { min-height: 100vh; background: var(--bg); overflow-x: hidden; }
+  .landing-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 60px; position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,13,20,0.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .landing-nav-links { display: flex; align-items: center; gap: 32px; }
+  .landing-nav-link { font-size: 14px; color: var(--text2); cursor: pointer; transition: color 0.2s; }
+  .landing-nav-link:hover { color: var(--text); }
+  .landing-hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 120px 20px 80px; position: relative;
+  }
+  .landing-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25);
+    color: var(--accent2); font-size: 12px; font-weight: 600;
+    padding: 5px 14px; border-radius: 20px; letter-spacing: 0.5px;
+    margin-bottom: 24px; text-transform: uppercase;
+  }
+  .landing-h1 {
+    font-family: var(--font-head); font-size: clamp(38px, 6vw, 72px);
+    font-weight: 800; line-height: 1.08; letter-spacing: -2px;
+    max-width: 860px; margin: 0 auto 24px;
+  }
+  .landing-h1 .grad {
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .landing-sub {
+    font-size: clamp(16px, 2vw, 20px); color: var(--text2); max-width: 560px;
+    margin: 0 auto 40px; line-height: 1.6;
+  }
+  .landing-cta { display: flex; align-items: center; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 60px; }
+  .landing-btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; padding: 14px 32px; border-radius: 10px; font-size: 16px;
+    font-weight: 600; cursor: pointer; border: none; font-family: var(--font-body);
+    box-shadow: 0 8px 32px rgba(99,102,241,0.4); transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .landing-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(99,102,241,0.55); }
+  .landing-btn-secondary {
+    background: transparent; color: var(--text); padding: 14px 28px;
+    border-radius: 10px; font-size: 15px; font-weight: 500; cursor: pointer;
+    border: 1px solid var(--border2); font-family: var(--font-body); transition: all 0.2s;
+  }
+  .landing-btn-secondary:hover { background: var(--card); border-color: var(--accent); }
+  .landing-preview {
+    width: 100%; max-width: 900px; margin: 0 auto;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 18px; overflow: hidden;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .preview-bar {
+    background: var(--bg2); padding: 12px 18px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .preview-dot { width: 11px; height: 11px; border-radius: 50%; }
+  .preview-url {
+    flex: 1; background: var(--bg3); border-radius: 6px;
+    padding: 4px 12px; font-size: 12px; color: var(--text3); margin: 0 12px;
+    text-align: center;
+  }
+  .landing-features { padding: 100px 60px; }
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1100px; margin: 0 auto; }
+  .feature-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px 24px;
+    transition: all 0.3s;
+  }
+  .feature-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(59,130,246,0.1); }
+  .feature-icon { font-size: 28px; margin-bottom: 14px; }
+  .feature-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .feature-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .landing-stats { padding: 80px 60px; background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; max-width: 900px; margin: 0 auto; text-align: center; }
+  .stat-num { font-family: var(--font-head); font-size: 42px; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .stat-lbl { font-size: 13px; color: var(--text3); margin-top: 4px; }
+  .landing-testimonials { padding: 100px 60px; }
+  .testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; max-width: 1100px; margin: 0 auto; }
+  .testi-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+  .testi-text { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
+  .testi-author { display: flex; align-items: center; gap: 10px; }
+  .testi-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .testi-name { font-size: 13px; font-weight: 600; }
+  .testi-role { font-size: 11px; color: var(--text3); }
+  .landing-footer { padding: 40px 60px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: gap; }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-link { font-size: 13px; color: var(--text3); cursor: pointer; transition: color 0.2s; }
+  .footer-link:hover { color: var(--text); }
+  .section-label { text-align: center; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent2); margin-bottom: 14px; }
+  .section-heading { text-align: center; font-family: var(--font-head); font-size: clamp(26px, 4vw, 40px); font-weight: 800; margin-bottom: 14px; }
+  .section-sub { text-align: center; color: var(--text2); font-size: 15px; max-width: 520px; margin: 0 auto 56px; line-height: 1.6; }
+  @media (max-width: 900px) {
+    .landing-nav { padding: 16px 20px; }
+    .landing-nav-links { display: none; }
+    .landing-features, .landing-stats, .landing-testimonials { padding: 60px 20px; }
+    .features-grid, .testi-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .landing-footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 20px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+// ─── STATE ───
+const state = {
+  page: 'landing',
+  authMode: 'login',
+  tasks: [
+    { id: 1, name: 'Deploy microservices to Kubernetes cluster', priority: 'high', deadline: '2025-04-23', done: false, duration: 90, category: 'DevOps' },
+    { id: 2, name: 'Code review: authentication module', priority: 'high', deadline: '2025-04-22', done: false, duration: 45, category: 'Review' },
+    { id: 3, name: 'Update API documentation', priority: 'medium', deadline: '2025-04-24', done: false, duration: 60, category: 'Docs' },
+    { id: 4, name: 'Sprint planning meeting', priority: 'medium', deadline: '2025-04-22', done: true, duration: 60, category: 'Meeting' },
+    { id: 5, name: 'Fix login bug in staging', priority: 'high', deadline: '2025-04-22', done: false, duration: 30, category: 'Bug' },
+    { id: 6, name: 'Prepare quarterly report', priority: 'low', deadline: '2025-04-28', done: false, duration: 120, category: 'Report' },
+  ],
+  notifications: [
+    { id: 1, icon: '⚠️', iconBg: 'rgba(239,68,68,0.12)', title: 'High workload detected tomorrow — 7 tasks due', time: '2 min ago', unread: true },
+    { id: 2, icon: '🕐', iconBg: 'rgba(245,158,11,0.12)', title: 'Task "Deploy to Kubernetes" due in 3 hours', time: '15 min ago', unread: true },
+    { id: 3, icon: '🤖', iconBg: 'rgba(99,102,241,0.12)', title: 'AI schedule generated for Wednesday', time: '1 hr ago', unread: true },
+    { id: 4, icon: '📊', iconBg: 'rgba(16,185,129,0.12)', title: 'Weekly productivity report ready', time: '3 hr ago', unread: false },
+    { id: 5, icon: '💡', iconBg: 'rgba(59,130,246,0.12)', title: 'Tip: Your peak focus window is 9–11 AM', time: '1 day ago', unread: false },
+  ],
+  user: { name: 'Arjun Sharma', role: 'Senior Full Stack Dev', initials: 'AS' },
+  notifOpen: false,
+  selectedBlock: null,
+  selectedTask: null,
+  selectedFeed: null,
+  scheduleGenerated: false,
+  aiSchedule: [],
+  aiInsight: '',
+  aiLoading: false,
+  alertsDismissed: [],
+  alertActions: {},
+  alertRescheduling: null,
+  workPrefs: { startTime: '09:00', endTime: '18:00', maxTasks: '8', defaultDuration: '60', timezone: 'Asia/Kolkata (IST +5:30)' },
+  aiSettings: { style: 'Deep Work First', threshold: '8', autoGen: true },
+  scheduleBlockDone: {},
+  scheduleBlockRemoved: {},
+  focusTimerBlock: null,
+  rescheduleBlock: null,
+};
+
+// ─── NAV CONFIG ───
+const navItems = [
+  { id: 'dashboard', icon: '◉', label: 'Dashboard' },
+  { id: 'tasks', icon: '☑', label: 'My Tasks', badge: null },
+  { id: 'schedule', icon: '📅', label: 'AI Schedule', badge: '✦', badgeClass: 'yellow' },
+  { id: 'analytics', icon: '📊', label: 'Analytics' },
+  { id: 'alerts', icon: '🔔', label: 'Alerts & Risks', badge: '3', badgeClass: 'red' },
+  { id: 'feed', icon: '🌐', label: 'Intelligence Feed' },
+  { id: 'settings', icon: '⚙', label: 'Settings' },
+];
+
+// ─── RENDER ───
+function render() {
+  const root = document.getElementById('root');
+  if (state.page === 'landing') {
+    root.innerHTML = renderLanding();
+  } else if (state.page === 'auth') {
+    root.innerHTML = renderAuth();
+  } else {
+    root.innerHTML = renderApp();
+  }
+  attachEvents();
+}
+
+// ─── LANDING PAGE ───
+function renderLanding() {
+  return `
+  <div class="landing">
+    <!-- NAV -->
+    <nav class="landing-nav">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="logo-icon">✈</div>
+        <span class="logo-text">Task<span>Pilot</span></span>
+      </div>
+      <div class="landing-nav-links">
+        <span class="landing-nav-link" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Features</span>
+        <span class="landing-nav-link" onclick="document.getElementById('testimonials').scrollIntoView({behavior:'smooth'})">Reviews</span>
+        <span class="landing-nav-link" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Pricing</span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="landing-btn-secondary" style="padding:9px 20px;font-size:14px;" onclick="goToAuth('login')">Sign In</button>
+        <button class="landing-btn-primary" style="padding:9px 20px;font-size:14px;" onclick="goToAuth('signup')">Get Started Free</button>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="landing-hero">
+      <div class="hero-bg">
+        <div class="hero-bg-circle" style="width:700px;height:700px;background:#6366f1;top:-200px;left:-150px;opacity:0.07;"></div>
+        <div class="hero-bg-circle" style="width:500px;height:500px;background:#3b82f6;bottom:-100px;right:-100px;opacity:0.06;"></div>
+        <div class="hero-bg-circle" style="width:300px;height:300px;background:#22d3ee;top:30%;left:60%;opacity:0.04;"></div>
+      </div>
+      <div class="landing-eyebrow">✦ AI-Powered · Free to Use · Built for Developers</div>
+      <h1 class="landing-h1">Stop Planning Manually.<br/><span class="grad">Let AI Build Your Day.</span></h1>
+      <p class="landing-sub">TaskPilot analyzes your tasks, deadlines, and energy levels to generate the perfect daily schedule — so you can focus on shipping, not planning.</p>
+      <div class="landing-cta">
+        <button class="landing-btn-primary" onclick="goToAuth('signup')">✈ Start for Free — No Credit Card</button>
+        <button class="landing-btn-secondary" onclick="goToAuth('login')">Sign in to existing account</button>
+      </div>
+      <!-- App Preview -->
+      <div class="landing-preview">
+        <div class="preview-bar">
+          <div class="preview-dot" style="background:#ef4444;"></div>
+          <div class="preview-dot" style="background:#f59e0b;"></div>
+          <div class="preview-dot" style="background:#10b981;"></div>
+          <div class="preview-url">taskpilot.app/dashboard</div>
+        </div>
+        <div style="display:grid;grid-template-columns:200px 1fr;height:340px;">
+          <!-- Mini sidebar -->
+          <div style="background:var(--bg2);border-right:1px solid var(--border);padding:16px 12px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;padding:0 4px;">
+              <div style="width:28px;height:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;">✈</div>
+              <span style="font-family:var(--font-head);font-size:14px;font-weight:800;">Task<span style="color:var(--accent);">Pilot</span></span>
+            </div>
+            ${[['◉','Dashboard',false],['☑','My Tasks',true],['📅','AI Schedule',false],['📊','Analytics',false],['🔔','Alerts',false]].map(([ic,lb,act])=>`
+            <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;margin-bottom:2px;background:${act?'rgba(59,130,246,0.12)':'transparent'};color:${act?'var(--accent)':'var(--text3)'};">
+              <span style="font-size:13px;">${ic}</span><span style="font-size:12px;">${lb}</span>
+            </div>`).join('')}
+          </div>
+          <!-- Mini content -->
+          <div style="padding:20px;overflow:hidden;">
+            <div style="font-family:var(--font-head);font-size:16px;font-weight:800;margin-bottom:4px;">Good morning, Arjun 👋</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:16px;">You have 5 tasks pending today</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
+              ${[['📋','6','Tasks','blue'],['✅','1','Done','green'],['🔥','3','High','red'],['⏰','2','Due Today','yellow']].map(([ic,v,lb,cl])=>`
+              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;position:relative;overflow:hidden;">
+                <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--${cl});"></div>
+                <div style="font-size:11px;margin-bottom:4px;">${ic}</div>
+                <div style="font-family:var(--font-head);font-size:20px;font-weight:700;">${v}</div>
+                <div style="font-size:10px;color:var(--text3);">${lb}</div>
+              </div>`).join('')}
+            </div>
+            ${[
+              ['Deploy K8s cluster','high','DevOps','Apr 23'],
+              ['Code review: auth','high','Review','Apr 22'],
+              ['Update API docs','medium','Docs','Apr 24'],
+            ].map(([name,pri,cat,dl])=>`
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg3);border-radius:6px;margin-bottom:6px;border:1px solid var(--border);">
+              <div style="width:6px;height:6px;border-radius:50%;background:${pri==='high'?'var(--red)':pri==='medium'?'var(--yellow)':'var(--green)'};flex-shrink:0;"></div>
+              <span style="flex:1;font-size:12px;">${name}</span>
+              <span style="font-size:10px;background:rgba(59,130,246,0.1);color:var(--accent);padding:1px 6px;border-radius:10px;">${cat}</span>
+              <span style="font-size:10px;color:var(--text3);">${dl}</span>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="landing-stats">
+      <div class="stats-grid">
+        <div><div class="stat-num">55%</div><div class="stat-lbl">Faster task completion with AI scheduling</div></div>
+        <div><div class="stat-num">3.2h</div><div class="stat-lbl">Average time saved per developer per week</div></div>
+        <div><div class="stat-num">10k+</div><div class="stat-lbl">IT professionals using TaskPilot</div></div>
+        <div><div class="stat-num">98%</div><div class="stat-lbl">User satisfaction rate</div></div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="landing-features" id="features">
+      <div class="section-label">Everything you need</div>
+      <div class="section-heading">Built for how IT teams actually work</div>
+      <div class="section-sub">Every feature is designed around the real pain points of engineers, DevOps, and tech leads.</div>
+      <div class="features-grid">
+        ${[
+          ['🤖','AI Schedule Generator','Paste in your tasks and let AI arrange your entire day — respecting deadlines, energy levels, and focus windows.'],
+          ['⚠️','Overload Detection','Get warned before you burn out. TaskPilot flags overcommitment and suggests what to defer or delegate.'],
+          ['📊','Productivity Analytics','See exactly where your time goes — deep work vs meetings vs reviews — with weekly trends and completion rates.'],
+          ['🌐','Intelligence Feed','Stay on top of the tools and trends that matter — Kubernetes updates, AI tool releases, security patches, career data.'],
+          ['▶ ','Focus Timer','Start a timed focus session directly from any schedule block with a live countdown ring.'],
+          ['🔔','Smart Alerts','Real-time alerts for deadlines, sprint progress, deployment checklists, and calendar overload — all actionable.'],
+          ['📅','Drag & Edit Schedule','Click any schedule block to edit its name, time, priority, and category. Changes reflect instantly.'],
+          ['💾','Data Export','Download your full task and preference data as JSON anytime. Your data is yours.'],
+          ['🎯','Work Preferences','Set your work hours, timezone, and scheduling style — AI adapts its output to fit your life.'],
+        ].map(([icon,title,desc])=>`
+        <div class="feature-card">
+          <div class="feature-icon">${icon}</div>
+          <div class="feature-title">${title}</div>
+          <div class="feature-desc">${desc}</div>
+        </div>`).join('')}
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="landing-testimonials" id="testimonials" style="background:var(--bg2);border-top:1px solid var(--border);">
+      <div class="section-label">What people say</div>
+      <div class="section-heading">Loved by IT professionals</div>
+      <div class="section-sub">From solo developers to engineering teams — TaskPilot fits into any workflow.</div>
+      <div class="testi-grid">
+        ${[
+          ['"TaskPilot\'s AI schedule is scary good. It somehow knows exactly when I do my best deep work and puts the hard stuff there. My sprint velocity went up 30% in a month."','Rahul M.','Senior DevOps Engineer, Bangalore','#6366f1'],
+          ['"I used to spend 20 minutes every morning figuring out what to tackle first. Now I just hit Generate and my whole day is planned. The overload alerts alone are worth it."','Priya S.','Full Stack Developer, Hyderabad','#3b82f6'],
+          ['"The Intelligence Feed is my favorite hidden gem. I found out about the OpenSSL vulnerability through TaskPilot before my security team even pinged us. Patched in an hour."','Ankit V.','Platform Engineer, Pune','#10b981'],
+        ].map(([text,name,role,color])=>`
+        <div class="testi-card">
+          <div class="testi-text">${text}</div>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:${color};">${name.split(' ').map(w=>w[0]).join('')}</div>
+            <div><div class="testi-name">${name}</div><div class="testi-role">${role}</div></div>
+          </div>
+        </div>`).join('')}
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing" style="padding:100px 60px;text-align:center;">
+      <div class="section-label">Pricing</div>
+      <div class="section-heading">Simple, honest pricing</div>
+      <div class="section-sub">Start free. No credit card required. Upgrade only when you need to.</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:900px;margin:0 auto;">
+        ${[
+          { name:'Free', price:'₹0', period:'/forever', color:'var(--border)', features:['Up to 20 tasks/month','AI Schedule (5 generates/day)','Basic Analytics','Intelligence Feed','Email support'], cta:'Get Started Free', primary:false },
+          { name:'Pro', price:'₹499', period:'/month', color:'var(--accent)', features:['Unlimited tasks','Unlimited AI Schedules','Advanced Analytics','Priority alerts','Focus Timer','Data export','Priority support'], cta:'Start Pro Free Trial', primary:true },
+          { name:'Team', price:'₹1,999', period:'/month', color:'var(--purple)', features:['Everything in Pro','Up to 10 team members','Shared task boards','Team workload view','Admin dashboard','Slack integration','Dedicated support'], cta:'Contact Sales', primary:false },
+        ].map(p=>`
+        <div style="background:var(--card);border:1px solid ${p.primary?'var(--accent)':'var(--border)'};border-radius:var(--radius);padding:28px 24px;position:relative;${p.primary?'box-shadow:0 0 40px rgba(59,130,246,0.15);':''}" >
+          ${p.primary?'<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:3px 14px;border-radius:20px;white-space:nowrap;">MOST POPULAR</div>':''}
+          <div style="font-family:var(--font-head);font-size:16px;font-weight:700;margin-bottom:8px;">${p.name}</div>
+          <div style="font-family:var(--font-head);font-size:36px;font-weight:800;color:${p.color};">${p.price}<span style="font-size:14px;color:var(--text3);font-weight:400;">${p.period}</span></div>
+          <div style="height:1px;background:var(--border);margin:18px 0;"></div>
+          ${p.features.map(f=>`<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-bottom:8px;text-align:left;"><span style="color:var(--green);">✓</span>${f}</div>`).join('')}
+          <button class="${p.primary?'landing-btn-primary':'landing-btn-secondary'}" style="width:100%;margin-top:16px;justify-content:center;" onclick="goToAuth('signup')">${p.cta}</button>
+        </div>`).join('')}
+      </div>
+    </section>
+
+    <!-- CTA BANNER -->
+    <section style="padding:80px 60px;text-align:center;background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(59,130,246,0.08));border-top:1px solid var(--border);">
+      <div style="font-family:var(--font-head);font-size:clamp(24px,4vw,42px);font-weight:800;margin-bottom:16px;">Ready to take control of your workday?</div>
+      <div style="color:var(--text2);font-size:16px;margin-bottom:36px;">Join 10,000+ IT professionals who plan smarter with TaskPilot.</div>
+      <button class="landing-btn-primary" style="font-size:17px;padding:16px 40px;margin:0 auto;" onclick="goToAuth('signup')">✈ Get Started for Free</button>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="landing-footer">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="logo-icon" style="width:28px;height:28px;font-size:14px;">✈</div>
+        <span class="logo-text" style="font-size:15px;">Task<span>Pilot</span></span>
+        <span style="color:var(--text3);font-size:12px;margin-left:8px;">© 2025 TaskPilot. All rights reserved.</span>
+      </div>
+      <div class="footer-links">
+        <span class="footer-link">Privacy Policy</span>
+        <span class="footer-link">Terms of Service</span>
+        <span class="footer-link">Contact</span>
+        <span class="footer-link" onclick="goToAuth('login')">Sign In</span>
+      </div>
+    </footer>
+  </div>`;
+}
+
+function goToAuth(mode) {
+  state.authMode = mode;
+  state.page = 'auth';
+  render();
+}
+
+// ─── AUTH ───
+function renderAuth() {
+  const isLogin = state.authMode === 'login';
+  return `
+  <div class="auth-page">
+    <div class="hero-bg">
+      <div class="hero-bg-circle" style="width:600px;height:600px;background:#6366f1;top:-200px;left:-100px;"></div>
+      <div class="hero-bg-circle" style="width:400px;height:400px;background:#3b82f6;bottom:-100px;right:-50px;"></div>
+    </div>
+    <div class="auth-card" style="position:relative;z-index:1;">
+      <div class="auth-logo">
+        <div class="logo-icon">✈</div>
+        <span class="logo-text">Task<span>Pilot</span></span>
+      </div>
+      <div class="auth-title">${isLogin ? 'Welcome back' : 'Get started'}</div>
+      <div class="auth-sub">${isLogin ? 'Sign in to your workspace' : 'Create your TaskPilot account'}</div>
+      ${!isLogin ? `
+      <div class="input-group">
+        <label class="input-label">Full Name</label>
+        <input class="input" id="auth-name" type="text" placeholder="Arjun Sharma"/>
+      </div>` : ''}
+      <div class="input-group">
+        <label class="input-label">Email</label>
+        <input class="input" id="auth-email" type="email" placeholder="you@company.com"/>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Password</label>
+        <input class="input" id="auth-pass" type="password" placeholder="••••••••"/>
+      </div>
+      ${!isLogin ? `
+      <div class="input-group">
+        <label class="input-label">Role / Job Title</label>
+        <select class="select" id="auth-role">
+          <option>Senior Full Stack Developer</option>
+          <option>DevOps Engineer</option>
+          <option>Engineering Manager</option>
+          <option>Data Engineer</option>
+          <option>QA Lead</option>
+          <option>Product Manager</option>
+          <option>Solutions Architect</option>
+        </select>
+      </div>` : ''}
+      <button class="btn btn-primary btn-full" style="margin-top:4px;" onclick="doAuth()">${isLogin ? '→ Sign In' : '→ Create Account'}</button>
+      <div class="auth-divider">or continue with</div>
+      <button class="btn btn-secondary btn-full" onclick="doAuth()">🔑 Continue with Google SSO</button>
+      <div class="auth-switch">
+        ${isLogin ? "Don't have an account? <span onclick=\"toggleAuth()\">Sign up free</span>" : "Already have an account? <span onclick=\"toggleAuth()\">Sign in</span>"}
+      </div>
+      <div style="text-align:center;margin-top:12px;">
+        <span onclick="state.page='landing';render()" style="font-size:12px;color:var(--text3);cursor:pointer;transition:color 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">← Back to home</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function doAuth() {
+  state.page = 'dashboard';
+  const nameEl = document.getElementById('auth-name');
+  if (nameEl && nameEl.value) state.user.name = nameEl.value;
+  state.user.initials = state.user.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  render();
+}
+
+function toggleAuth() {
+  state.authMode = state.authMode === 'login' ? 'signup' : 'login';
+  render();
+}
+
+// ─── APP SHELL ───
+function renderApp() {
+  return `
+  <div class="app">
+    <div class="overlay-bg ${state.notifOpen ? 'open' : ''}" onclick="closeNotif()"></div>
+    ${renderSidebar()}
+    <div class="main">
+      ${renderTopbar()}
+      ${renderPages()}
+    </div>
+    ${renderNotifPanel()}
+    ${renderAddTaskModal()}
+    ${renderBlockDetailModal()}
+    ${renderTaskDetailModal()}
+    ${renderFeedDetailModal()}
+    ${renderRescheduleModal()}
+    ${renderFocusTimerModal()}
+  </div>`;
+}
+
+function renderSidebar() {
+  return `
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">✈</div>
+      <span class="logo-text">Task<span>Pilot</span></span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      ${navItems.slice(0,4).map(n => renderNavItem(n)).join('')}
+      <div class="nav-section-title">Insights</div>
+      ${navItems.slice(4).map(n => renderNavItem(n)).join('')}
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-card">
+        <div class="user-avatar">${state.user.initials}</div>
+        <div class="user-info">
+          <div class="user-name">${state.user.name}</div>
+          <div class="user-role">${state.user.role}</div>
+        </div>
+        <span style="color:var(--text3);font-size:12px;">⋯</span>
+      </div>
+    </div>
+  </aside>`;
+}
+
+function renderNavItem(n) {
+  const active = state.page === n.id;
+  const pendingTasks = state.tasks.filter(t => !t.done).length;
+  let badge = n.badge;
+  if (n.id === 'tasks') badge = pendingTasks > 0 ? pendingTasks : null;
+  return `
+  <div class="nav-item ${active ? 'active' : ''}" onclick="navigate('${n.id}')">
+    <span style="font-size:15px;">${n.icon}</span>
+    <span>${n.label}</span>
+    ${badge ? `<span class="nav-badge ${n.badgeClass || ''}">${badge}</span>` : ''}
+  </div>`;
+}
+
+function renderTopbar() {
+  const titles = { dashboard: 'Dashboard', tasks: 'My Tasks', schedule: 'AI Schedule', analytics: 'Analytics', alerts: 'Alerts & Risks', feed: 'Intelligence Feed', settings: 'Settings' };
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const unread = state.notifications.filter(n => n.unread).length;
+  return `
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+      <div>
+        <div class="topbar-title">${titles[state.page] || 'TaskPilot'}</div>
+        <div class="topbar-date" style="font-size:11px;color:var(--text3);">${dateStr}</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      ${state.page === 'tasks' ? `<button class="btn btn-primary btn-sm" onclick="openAddTask()">+ Add Task</button>` : ''}
+      <div class="icon-btn" onclick="toggleNotif()">
+        🔔 ${unread > 0 ? `<span class="notif-dot"></span>` : ''}
+      </div>
+      <div class="icon-btn" onclick="navigate('settings')">⚙</div>
+    </div>
+  </header>`;
+}
+
+function renderPages() {
+  return `
+  <div id="page-dashboard" class="page ${state.page==='dashboard'?'active':''}">
+    ${renderDashboard()}
+  </div>
+  <div id="page-tasks" class="page ${state.page==='tasks'?'active':''}">
+    ${renderTasks()}
+  </div>
+  <div id="page-schedule" class="page ${state.page==='schedule'?'active':''}">
+    ${renderSchedule()}
+  </div>
+  <div id="page-analytics" class="page ${state.page==='analytics'?'active':''}">
+    ${renderAnalytics()}
+  </div>
+  <div id="page-alerts" class="page ${state.page==='alerts'?'active':''}">
+    ${renderAlerts()}
+  </div>
+  <div id="page-feed" class="page ${state.page==='feed'?'active':''}">
+    ${renderFeed()}
+  </div>
+  <div id="page-settings" class="page ${state.page==='settings'?'active':''}">
+    ${renderSettings()}
+  </div>`;
+}
+
+// ─── DASHBOARD ───
+function renderDashboard() {
+  const done = state.tasks.filter(t => t.done).length;
+  const total = state.tasks.length;
+  const highPriority = state.tasks.filter(t => t.priority === 'high' && !t.done).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  const todayTasks = state.tasks.filter(t => !t.done).slice(0,3);
+  return `
+  <div style="margin-bottom:20px;">
+    <div style="font-family:var(--font-head);font-size:22px;font-weight:800;margin-bottom:4px;">
+      Good ${getTimeOfDay()}, ${state.user.name.split(' ')[0]} 👋
+    </div>
+    <div style="color:var(--text3);font-size:14px;">Here's your work overview for today</div>
+  </div>
+
+  ${highPriority > 0 ? `
+  <div class="alert red mb-16" style="margin-bottom:16px;">
+    <span class="alert-icon">⚠️</span>
+    <div class="alert-content">
+      <div class="alert-title">High Workload Detected</div>
+      <div class="alert-desc">You have ${highPriority} high-priority tasks pending today. Consider delegating or rescheduling.</div>
+    </div>
+    <span class="alert-close" onclick="this.parentElement.style.display='none'">×</span>
+  </div>` : ''}
+
+  <div class="grid-4" style="margin-bottom:22px;">
+    <div class="stat-card blue">
+      <div class="stat-top">
+        <span class="stat-icon">📋</span>
+        <span class="stat-trend up">↑ 2</span>
+      </div>
+      <div class="stat-value">${total}</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-top">
+        <span class="stat-icon">✅</span>
+        <span class="stat-trend up">${pct}%</span>
+      </div>
+      <div class="stat-value">${done}</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-top">
+        <span class="stat-icon">🔥</span>
+        <span class="stat-trend down">Critical</span>
+      </div>
+      <div class="stat-value">${highPriority}</div>
+      <div class="stat-label">High Priority</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-top">
+        <span class="stat-icon">⏰</span>
+        <span class="stat-trend down">Today</span>
+      </div>
+      <div class="stat-value">${state.tasks.filter(t=>!t.done&&t.deadline==='2025-04-22').length}</div>
+      <div class="stat-label">Due Today</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:22px;">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Today's Priority Tasks</span>
+        <span class="card-action" onclick="navigate('tasks')">View all</span>
+      </div>
+      ${todayTasks.map(t => `
+      <div class="task-item" onclick="openTaskDetail(${t.id})">
+        <div class="task-check ${t.done?'done':''}" onclick="event.stopPropagation();toggleTask(${t.id})"></div>
+        <div class="priority-dot ${t.priority}"></div>
+        <div class="task-body">
+          <div class="task-name ${t.done?'done':''}">${t.name}</div>
+          <div class="task-meta">
+            <span class="tag tag-${t.priority}">${t.priority}</span>
+            <span class="tag tag-blue">${t.category}</span>
+            <span class="task-deadline">📅 ${t.deadline}</span>
+          </div>
+        </div>
+      </div>`).join('')}
+      <button class="btn btn-secondary btn-full btn-sm" style="margin-top:8px;" onclick="openAddTask()">+ Add Task</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Today's Schedule</span>
+        <span class="card-action" onclick="navigate('schedule')">AI Schedule</span>
+      </div>
+      ${renderMiniSchedule()}
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Completion Progress</span>
+        <span style="font-size:13px;color:var(--text3);">${done}/${total} tasks</span>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div class="flex items-center justify-between mb-8">
+          <span class="text-sm text-muted">Overall Progress</span>
+          <span class="text-sm text-accent">${pct}%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill blue" style="width:${pct}%"></div></div>
+      </div>
+      ${['DevOps','Review','Docs','Meeting'].map((cat,i) => {
+        const p = [60,40,20,100][i];
+        const cls = ['blue','yellow','green','green'][i];
+        return `<div style="margin-bottom:10px;">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-sm text-muted">${cat}</span>
+            <span class="text-sm" style="color:var(--text2)">${p}%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill ${cls}" style="width:${p}%"></div></div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">AI Productivity Insight</span>
+        <span style="font-size:11px;color:var(--accent2);background:rgba(99,102,241,0.1);padding:3px 8px;border-radius:20px;">LIVE</span>
+      </div>
+      <div class="ai-response">
+        <div class="ai-label"><div class="ai-dot"></div>TaskPilot AI</div>
+        <div class="ai-text">Based on your task load, I recommend tackling <strong>code review</strong> first at 9 AM during your peak focus window (9–11 AM). Block your calendar for the <strong>Kubernetes deployment</strong> from 2–4 PM when meetings typically slow. Consider pushing the quarterly report to Thursday — you're overcommitted today. 💡</div>
+      </div>
+      <div class="divider"></div>
+      <div class="flex items-center justify-between">
+        <span style="font-size:13px;color:var(--text2);">Focus score today</span>
+        <span style="font-family:var(--font-head);font-size:22px;font-weight:700;color:var(--green);">78<span style="font-size:13px;font-weight:400;color:var(--text3);">/100</span></span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderMiniSchedule() {
+  const slots = [
+    { time:'9:00 AM', name:'Code Review', dur:'45 min', color:'var(--accent)' },
+    { time:'10:00 AM', name:'Deep Work: Auth Fix', dur:'60 min', color:'var(--green)' },
+    { time:'11:30 AM', name:'Team Standup', dur:'30 min', color:'var(--yellow)' },
+    { time:'2:00 PM', name:'K8s Deployment', dur:'90 min', color:'var(--purple)' },
+  ];
+  return slots.map(s => `
+  <div class="schedule-block">
+    <div class="schedule-time"><span class="schedule-time-main">${s.time.split(' ')[0]}</span><span>${s.time.split(' ')[1]}</span></div>
+    <div class="schedule-body">
+      <div class="schedule-left">
+        <div class="schedule-color" style="background:${s.color}"></div>
+        <div class="schedule-info"><div class="sched-name">${s.name}</div><div class="sched-dur">${s.dur}</div></div>
+      </div>
+    </div>
+  </div>`).join('');
+}
+
+// ─── TASKS ───
+function renderTasks() {
+  const byPriority = { high: [], medium: [], low: [] };
+  state.tasks.forEach(t => byPriority[t.priority].push(t));
+  return `
+  <div class="flex items-center justify-between mb-20">
+    <div>
+      <div style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:3px;">Task Manager</div>
+      <div style="color:var(--text3);font-size:13px;">${state.tasks.filter(t=>!t.done).length} pending · ${state.tasks.filter(t=>t.done).length} completed</div>
+    </div>
+    <button class="btn btn-primary" onclick="openAddTask()">+ New Task</button>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      ${renderTaskSection('🔴 High Priority', byPriority.high, 'high')}
+      ${renderTaskSection('🟡 Medium Priority', byPriority.medium, 'medium')}
+    </div>
+    <div>
+      ${renderTaskSection('🟢 Low Priority', byPriority.low, 'low')}
+      <div class="card" style="margin-top:0;">
+        <div class="card-header">
+          <span class="card-title">Task Summary</span>
+        </div>
+        ${['high','medium','low'].map(p => {
+          const count = state.tasks.filter(t=>t.priority===p).length;
+          const done = state.tasks.filter(t=>t.priority===p&&t.done).length;
+          const pct = count ? Math.round(done/count*100) : 0;
+          const cls = {high:'red',medium:'yellow',low:'green'}[p];
+          return `<div style="margin-bottom:14px;">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm" style="text-transform:capitalize;">${p} Priority</span>
+              <span class="text-sm text-muted">${done}/${count}</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderTaskSection(title, tasks, priority) {
+  return `
+  <div class="card mb-16" style="margin-bottom:18px;">
+    <div class="card-header">
+      <span class="card-title">${title}</span>
+      <span style="font-size:11px;color:var(--text3);background:var(--bg3);padding:3px 8px;border-radius:20px;">${tasks.length}</span>
+    </div>
+    ${tasks.length === 0 ? `<div class="empty-state" style="padding:20px 0;"><div style="font-size:24px;margin-bottom:6px;">✓</div><div class="text-sm text-muted">All clear!</div></div>` : ''}
+    ${tasks.map(t => `
+    <div class="task-item" style="margin-bottom:8px;" onclick="openTaskDetail(${t.id})">
+      <div class="task-check ${t.done?'done':''}" onclick="event.stopPropagation();toggleTask(${t.id})"></div>
+      <div class="task-body">
+        <div class="task-name ${t.done?'done':''}">${t.name}</div>
+        <div class="task-meta">
+          <span class="tag tag-blue">${t.category}</span>
+          <span class="task-deadline">📅 ${t.deadline}</span>
+          <span class="task-deadline">⏱ ${t.duration}m</span>
+        </div>
+      </div>
+      <div class="task-actions">
+        <button class="btn btn-sm btn-danger" onclick="deleteTask(event,${t.id})">✕</button>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ─── AI SCHEDULE ───
+function renderSchedule() {
+  const defaultBlocks = [
+    { time:'09:00', end:'09:45', name:'Code Review: Auth Module', priority:'high', color:'var(--red)', cat:'Review' },
+    { time:'09:45', end:'10:00', name:'Short Break', priority:'low', color:'var(--text3)', cat:'Break' },
+    { time:'10:00', end:'11:00', name:'Fix Login Bug (Staging)', priority:'high', color:'var(--red)', cat:'Bug Fix' },
+    { time:'11:00', end:'11:30', name:'Team Standup', priority:'medium', color:'var(--yellow)', cat:'Meeting' },
+    { time:'11:30', end:'12:30', name:'Deep Work: API Documentation', priority:'medium', color:'var(--accent)', cat:'Docs' },
+    { time:'12:30', end:'13:30', name:'Lunch Break', priority:'low', color:'var(--green)', cat:'Break' },
+    { time:'13:30', end:'15:00', name:'K8s Deployment', priority:'high', color:'var(--purple)', cat:'DevOps' },
+    { time:'15:00', end:'17:00', name:'Quarterly Report Draft', priority:'low', color:'var(--accent3)', cat:'Report' },
+  ];
+
+  const blocks = state.aiSchedule.length ? state.aiSchedule : defaultBlocks;
+
+  return `
+  <div class="flex items-center justify-between mb-20">
+    <div>
+      <div style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:3px;">AI Schedule Generator ⭐</div>
+      <div style="color:var(--text3);font-size:13px;">Intelligent scheduling based on task priority and deadlines</div>
+    </div>
+    <button class="btn btn-primary" onclick="generateSchedule()" ${state.aiLoading?'disabled':''}>
+      ${state.aiLoading ? '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> Generating...' : '🤖 Generate Schedule'}
+    </button>
+  </div>
+
+  ${state.aiLoading ? `
+  <div class="card mb-20" style="text-align:center;padding:40px;margin-bottom:20px;">
+    <div class="spinner" style="margin:0 auto 14px;width:36px;height:36px;"></div>
+    <div style="font-family:var(--font-head);font-size:16px;margin-bottom:6px;">AI is analyzing your tasks...</div>
+    <div class="text-sm text-muted">Optimizing for deadlines, priority, and energy levels</div>
+  </div>` : ''}
+
+  ${state.aiInsight ? `
+  <div class="ai-response mb-20" style="margin-bottom:20px;">
+    <div class="ai-label"><div class="ai-dot"></div>AI Schedule Analysis</div>
+    <div class="ai-text">${state.aiInsight}</div>
+  </div>` : ''}
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📅 Optimized Day Plan</span>
+          <span style="font-size:11px;color:var(--text3);">April 22, 2025</span>
+        </div>
+        ${blocks.map((b, idx) => `
+        <div class="schedule-block" onclick="openBlock(${idx})" style="cursor:pointer;">
+          <div class="schedule-time">
+            <span class="schedule-time-main">${b.time}</span>
+            <span>→ ${b.end}</span>
+          </div>
+          <div class="schedule-body">
+            <div class="schedule-left">
+              <div class="schedule-color" style="background:${b.color}"></div>
+              <div class="schedule-info">
+                <div class="sched-name">${b.name}</div>
+                <div class="sched-dur">${b.cat}</div>
+              </div>
+            </div>
+            <span class="tag ${b.priority === 'high' ? 'tag-high' : b.priority === 'medium' ? 'tag-medium' : 'tag-low'}">${b.priority}</span>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div>
+      <div class="card mb-16" style="margin-bottom:18px;">
+        <div class="card-header"><span class="card-title">Time Distribution</span></div>
+        <div class="analytics-row">
+          <span class="analytics-label">Deep Work</span>
+          <div class="analytics-bar"><div class="analytics-fill" style="width:45%;background:var(--accent)"></div></div>
+          <span class="analytics-value">3.5h</span>
+        </div>
+        <div class="analytics-row">
+          <span class="analytics-label">Meetings</span>
+          <div class="analytics-bar"><div class="analytics-fill" style="width:12%;background:var(--yellow)"></div></div>
+          <span class="analytics-value">1h</span>
+        </div>
+        <div class="analytics-row">
+          <span class="analytics-label">Reviews</span>
+          <div class="analytics-bar"><div class="analytics-fill" style="width:15%;background:var(--purple)"></div></div>
+          <span class="analytics-value">0.75h</span>
+        </div>
+        <div class="analytics-row">
+          <span class="analytics-label">Breaks</span>
+          <div class="analytics-bar"><div class="analytics-fill" style="width:20%;background:var(--green)"></div></div>
+          <span class="analytics-value">1.25h</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Scheduling Tips</span></div>
+        ${[
+          ['🧠','Peak Focus (9–11 AM)','Schedule critical tasks in this window for best performance'],
+          ['☕','Post-lunch dip (1–2 PM)','Lighter work or a short walk during this period'],
+          ['⚡','Second Wind (3–5 PM)','Good for collaborative or creative tasks'],
+        ].map(([icon,t,d]) => `
+        <div class="feed-item" style="padding:10px 0;">
+          <div class="feed-icon" style="background:rgba(59,130,246,0.1);">${icon}</div>
+          <div class="feed-content"><div class="feed-title">${t}</div><div class="feed-time" style="font-size:11px;color:var(--text3);">${d}</div></div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── ANALYTICS ───
+function renderAnalytics() {
+  return `
+  <div style="margin-bottom:20px;">
+    <div style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:3px;">Productivity Analytics</div>
+    <div style="color:var(--text3);font-size:13px;">Track your time and performance trends</div>
+  </div>
+
+  <div class="grid-4" style="margin-bottom:22px;">
+    ${[
+      { icon:'⏱', val:'6.2h', label:'Focus Hours Today', trend:'+0.8h', up:true, cls:'blue' },
+      { icon:'✅', val:'83%', label:'Task Completion Rate', trend:'+5%', up:true, cls:'green' },
+      { icon:'📅', val:'2.1h', label:'Meeting Time', trend:'-30m', up:true, cls:'yellow' },
+      { icon:'🔥', val:'12', label:'Day Streak', trend:'Best: 18', up:null, cls:'red' },
+    ].map(s => `
+    <div class="stat-card ${s.cls}">
+      <div class="stat-top">
+        <span class="stat-icon">${s.icon}</span>
+        ${s.up !== null ? `<span class="stat-trend ${s.up?'up':'down'}">${s.trend}</span>` : `<span class="stat-trend up">${s.trend}</span>`}
+      </div>
+      <div class="stat-value">${s.val}</div>
+      <div class="stat-label">${s.label}</div>
+    </div>`).join('')}
+  </div>
+
+  <div class="grid-2" style="margin-bottom:22px;">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Weekly Activity (hrs)</span></div>
+      <div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 4px;">
+        ${[
+          { day:'Mon', focus:7, meeting:2 },
+          { day:'Tue', focus:6, meeting:3 },
+          { day:'Wed', focus:8, meeting:1 },
+          { day:'Thu', focus:5, meeting:4 },
+          { day:'Fri', focus:6, meeting:2 },
+          { day:'Sat', focus:3, meeting:0 },
+          { day:'Sun', focus:2, meeting:0 },
+        ].map(d => {
+          const maxH = 100; const max = 10;
+          const fH = Math.round(d.focus/max*maxH);
+          const mH = Math.round(d.meeting/max*maxH);
+          const isToday = d.day === 'Wed';
+          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+            <div style="width:100%;display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:flex-end;height:${maxH}px;">
+              <div style="width:70%;height:${mH}px;background:rgba(245,158,11,0.7);border-radius:3px 3px 0 0;"></div>
+              <div style="width:70%;height:${fH}px;background:${isToday?'var(--accent)':'rgba(59,130,246,0.4)'};border-radius:3px 3px 0 0;"></div>
+            </div>
+            <span style="font-size:10px;color:${isToday?'var(--accent)':'var(--text3)'};">${d.day}</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="flex gap-16" style="margin-top:10px;padding:0 4px;">
+        <div class="flex items-center gap-8"><div style="width:10px;height:10px;border-radius:2px;background:var(--accent)"></div><span class="text-sm text-muted">Focus</span></div>
+        <div class="flex items-center gap-8"><div style="width:10px;height:10px;border-radius:2px;background:rgba(245,158,11,0.7)"></div><span class="text-sm text-muted">Meetings</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">Time by Category</span></div>
+      <div class="donut-wrap">
+        <svg class="donut-svg" width="110" height="110" viewBox="0 0 42 42">
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="var(--border)" stroke-width="6"/>
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="var(--accent)" stroke-width="6" stroke-dasharray="40 60" stroke-dashoffset="0" transform="rotate(-90 21 21)"/>
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="var(--yellow)" stroke-width="6" stroke-dasharray="20 80" stroke-dashoffset="-40" transform="rotate(-90 21 21)"/>
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="var(--green)" stroke-width="6" stroke-dasharray="15 85" stroke-dashoffset="-60" transform="rotate(-90 21 21)"/>
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="var(--purple)" stroke-width="6" stroke-dasharray="25 75" stroke-dashoffset="-75" transform="rotate(-90 21 21)"/>
+          <text x="21" y="24" text-anchor="middle" fill="var(--text)" font-size="6" font-family="Syne" font-weight="700">8h</text>
+        </svg>
+        <div class="donut-legend">
+          ${[['var(--accent)','Development','40%'],['var(--yellow)','Meetings','20%'],['var(--green)','Reviews','15%'],['var(--purple)','Planning','25%']].map(([c,l,v]) => `
+          <div class="legend-row">
+            <div class="legend-dot" style="background:${c}"></div>
+            <span style="color:var(--text2);flex:1;">${l}</span>
+            <span style="color:var(--text3);">${v}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Task Completion by Day</span></div>
+    <div class="grid-3">
+      ${['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].map((day, i) => {
+        const vals = [8,6,5,7,9,3]; const dones = [7,5,5,4,9,2];
+        const pct = Math.round(dones[i]/vals[i]*100);
+        return `<div style="text-align:center;padding:12px;background:var(--bg3);border-radius:var(--radius-sm);">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">${day.slice(0,3)}</div>
+          <div style="font-family:var(--font-head);font-size:20px;font-weight:700;color:${pct>=80?'var(--green)':pct>=60?'var(--yellow)':'var(--red)'};">${pct}%</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px;">${dones[i]}/${vals[i]} tasks</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+// ─── ALERTS ───
+function renderAlerts() {
+  const alerts = [
+    { id:'a1', type:'red', icon:'🔴', title:'Critical Overload Today', desc:'You have 3 high-priority tasks all due by 6 PM. One must be rescheduled to avoid quality issues.', action:'Reschedule Task', actionFn:`openAlertAction('reschedule')` },
+    { id:'a2', type:'yellow', icon:'⚠️', title:'Meeting Overload This Week', desc:'8 meetings scheduled this week — 40% of your work hours. Consider declining 2–3 non-critical ones.', action:'Review Calendar', actionFn:`openAlertAction('calendar')` },
+    { id:'a3', type:'yellow', icon:'🕐', title:'K8s Deployment: 3 Hours Left', desc:'Kubernetes cluster deployment is due in 3 hours. Dependencies have not been fully resolved.', action:'Start Now', actionFn:`openAlertAction('k8s')` },
+    { id:'a4', type:'blue', icon:'💡', title:'Productivity Tip', desc:'Your focus score drops 30% after 3 PM on Fridays. Consider scheduling creative work earlier in the week.', action:'Adjust Schedule', actionFn:`navigate('schedule')` },
+    { id:'a5', type:'green', icon:'✅', title:'Sprint Goals On Track', desc:"7 out of 10 sprint items are completed. You're ahead of the 70% target at this point in the sprint.", action:'View Sprint', actionFn:`openAlertAction('sprint')` },
+  ].filter(a => !state.alertsDismissed.includes(a.id));
+
+  return `
+  <div style="margin-bottom:20px;">
+    <div style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:3px;">Alerts & Risk Detection</div>
+    <div style="color:var(--text3);font-size:13px;">Real-time workload monitoring and burnout prevention</div>
+  </div>
+
+  ${state.alertActions.msg ? `
+  <div class="alert green" style="margin-bottom:16px;">
+    <span class="alert-icon">✅</span>
+    <div class="alert-content"><div class="alert-title">${state.alertActions.msg}</div></div>
+    <span class="alert-close" onclick="state.alertActions={};render()">×</span>
+  </div>` : ''}
+
+  <div class="grid-2" style="margin-bottom:22px;">
+    ${[
+      { label:'Workload Risk', val:72, color:'var(--yellow)', level:'Moderate', icon:'⚡' },
+      { label:'Burnout Risk', val:28, color:'var(--green)', level:'Low', icon:'🧘' },
+      { label:'Deadline Pressure', val:85, color:'var(--red)', level:'High', icon:'⏰' },
+      { label:'Focus Quality', val:78, color:'var(--accent)', level:'Good', icon:'🎯' },
+    ].map(m => `
+    <div class="card">
+      <div class="flex items-center justify-between mb-8">
+        <span style="font-size:14px;">${m.icon} ${m.label}</span>
+        <span style="font-family:var(--font-head);font-size:20px;font-weight:700;color:${m.color};">${m.val}%</span>
+      </div>
+      <div class="progress-bar" style="height:8px;"><div class="progress-fill" style="width:${m.val}%;background:${m.color};border-radius:4px;"></div></div>
+      <div style="font-size:11px;margin-top:6px;color:var(--text3);">Status: <span style="color:${m.color};">${m.level}</span></div>
+    </div>`).join('')}
+  </div>
+
+  <div class="section-title"><span class="dot"></span>Active Alerts</div>
+  ${alerts.length === 0 ? `<div class="empty-state"><div class="empty-icon">🎉</div><div class="empty-text">All clear! No active alerts.</div></div>` : ''}
+  ${alerts.map(a => `
+  <div class="alert ${a.type}" style="margin-bottom:10px;" id="alert-${a.id}">
+    <span class="alert-icon">${a.icon}</span>
+    <div class="alert-content">
+      <div class="alert-title">${a.title}</div>
+      <div class="alert-desc">${a.desc}</div>
+    </div>
+    <button class="btn btn-sm btn-secondary" style="margin-left:8px;flex-shrink:0;font-size:11px;" onclick="${a.actionFn}">${a.action}</button>
+    <span class="alert-close" onclick="dismissAlert('${a.id}')">×</span>
+  </div>`).join('')}
+
+  ${state.alertActions.type === 'reschedule' ? `
+  <div class="card" style="margin-top:18px;border-color:var(--accent);">
+    <div class="card-header"><span class="card-title">📅 Reschedule Overloaded Tasks</span><span class="card-action" onclick="state.alertActions={};render()">Close</span></div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Select a task to reschedule to a later date:</p>
+    ${state.tasks.filter(t=>!t.done&&t.priority==='high').map(t=>`
+    <div class="task-item" style="margin-bottom:8px;">
+      <div class="task-body"><div class="task-name">${t.name}</div><div class="task-meta"><span class="tag tag-high">high</span><span class="task-deadline">📅 ${t.deadline}</span></div></div>
+      <input type="date" class="input" style="width:140px;" value="${t.deadline}" onchange="rescheduleTaskTo(${t.id}, this.value)"/>
+    </div>`).join('')}
+    <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="state.alertActions={msg:'Tasks rescheduled successfully!'};render()">✅ Confirm Reschedule</button>
+  </div>` : ''}
+
+  ${state.alertActions.type === 'calendar' ? `
+  <div class="card" style="margin-top:18px;border-color:var(--yellow);">
+    <div class="card-header"><span class="card-title">📆 This Week's Meetings</span><span class="card-action" onclick="state.alertActions={};render()">Close</span></div>
+    ${['Mon: Team Standup (9:00 AM, 30 min)','Tue: Product Review (2:00 PM, 60 min)','Wed: Sprint Planning (10:00 AM, 90 min)','Thu: 1:1 with Manager (11:00 AM, 30 min)','Thu: Architecture Review (3:00 PM, 60 min)','Fri: Release Sync (4:00 PM, 30 min)'].map((m,i)=>`
+    <div class="flex items-center justify-between" style="padding:8px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:13px;">${m}</span>
+      <button class="btn btn-sm btn-danger" onclick="this.closest('div').style.opacity='0.4';this.textContent='Declined'">Decline</button>
+    </div>`).join('')}
+    <button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="state.alertActions={msg:'Calendar updated — declined meetings removed.'};render()">Save Changes</button>
+  </div>` : ''}
+
+  ${state.alertActions.type === 'k8s' ? `
+  <div class="card" style="margin-top:18px;border-color:var(--purple);">
+    <div class="card-header"><span class="card-title">☸ K8s Deployment Checklist</span><span class="card-action" onclick="state.alertActions={};render()">Close</span></div>
+    ${['Run pre-deployment tests','Check cluster health (kubectl get nodes)','Verify Docker image tags','Confirm rollback plan is ready','Notify team in Slack #deployments'].map((item,i)=>`
+    <div class="flex items-center gap-10" style="padding:8px 0;border-bottom:1px solid var(--border);">
+      <div class="task-check" id="kc-${i}" onclick="this.classList.toggle('done')" style="cursor:pointer;flex-shrink:0;"></div>
+      <span style="font-size:13px;">${item}</span>
+    </div>`).join('')}
+    <button class="btn btn-primary" style="margin-top:12px;" onclick="state.alertActions={msg:'Deployment checklist saved. Good luck with the release!'};render()">▶ Start Deployment</button>
+  </div>` : ''}
+
+  ${state.alertActions.type === 'sprint' ? `
+  <div class="card" style="margin-top:18px;border-color:var(--green);">
+    <div class="card-header"><span class="card-title">🏃 Sprint Progress</span><span class="card-action" onclick="state.alertActions={};render()">Close</span></div>
+    <div style="margin-bottom:14px;">
+      <div class="flex items-center justify-between mb-8"><span class="text-sm text-muted">Sprint Completion</span><span class="text-sm text-green">70% — On Track</span></div>
+      <div class="progress-bar"><div class="progress-fill green" style="width:70%"></div></div>
+    </div>
+    ${[['✅','Deploy auth service','Done'],['✅','Write unit tests','Done'],['✅','API documentation','Done'],['✅','Fix staging bugs (4/4)','Done'],['✅','Code review batch','Done'],['✅','Performance profiling','Done'],['✅','Update CI/CD pipeline','Done'],['🔄','K8s deployment','In Progress'],['⏳','Quarterly report','Pending'],['⏳','Security audit prep','Pending']].map(([s,t,st])=>`
+    <div class="flex items-center gap-10" style="padding:6px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:14px;">${s}</span>
+      <span style="flex:1;font-size:13px;">${t}</span>
+      <span style="font-size:11px;color:var(--text3);">${st}</span>
+    </div>`).join('')}
+  </div>` : ''}`;
+}
+
+// ─── FEED ───
+function renderFeed() {
+  const items = [
+    { icon:'🤖', bg:'rgba(99,102,241,0.12)', title:'GitHub Copilot adds AI-powered test generation in latest update', time:'2 hours ago', tag:'AI Tools', tagClass:'tag-purple' },
+    { icon:'☸', bg:'rgba(59,130,246,0.12)', title:'Kubernetes 1.30 released with improved scheduling algorithms', time:'5 hours ago', tag:'DevOps', tagClass:'tag-blue' },
+    { icon:'📊', bg:'rgba(16,185,129,0.12)', title:'Study: Developers using AI tools complete tasks 55% faster', time:'1 day ago', tag:'Productivity', tagClass:'tag-low' },
+    { icon:'🔐', bg:'rgba(245,158,11,0.12)', title:'Critical OpenSSL vulnerability — patch immediately', time:'1 day ago', tag:'Security', tagClass:'tag-medium' },
+    { icon:'⚡', bg:'rgba(34,211,238,0.12)', title:'React 19 stable release: concurrent features now default', time:'2 days ago', tag:'Frontend', tagClass:'tag-blue' },
+    { icon:'🧠', bg:'rgba(239,68,68,0.12)', title:'Claude 3.5 API updates: improved code generation', time:'3 days ago', tag:'AI Tools', tagClass:'tag-purple' },
+    { icon:'📈', bg:'rgba(59,130,246,0.12)', title:'IT job market: DevOps salaries up 18% YoY in India', time:'3 days ago', tag:'Career', tagClass:'tag-low' },
+    { icon:'🐳', bg:'rgba(59,130,246,0.1)', title:'Docker Desktop 4.30 — Kubernetes integration overhaul', time:'4 days ago', tag:'DevOps', tagClass:'tag-blue' },
+  ];
+  return `
+  <div style="margin-bottom:20px;">
+    <div style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:3px;">Intelligence Feed</div>
+    <div style="color:var(--text3);font-size:13px;">AI tool trends, industry updates, and productivity insights</div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Latest Tech Updates</span>
+          <span class="card-action">Filter</span>
+        </div>
+        ${items.map((it, idx) => `
+        <div class="feed-item" style="cursor:pointer;" onclick="openFeedItem(${idx})">
+          <div class="feed-icon" style="background:${it.bg};">${it.icon}</div>
+          <div class="feed-content">
+            <div class="feed-title" style="transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color=''">${it.title}</div>
+            <div class="feed-meta">
+              <span class="tag ${it.tagClass}">${it.tag}</span>
+              <span class="feed-time">${it.time}</span>
+            </div>
+          </div>
+          <span style="color:var(--text3);font-size:18px;align-self:center;">›</span>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div>
+      <div class="card mb-16" style="margin-bottom:18px;">
+        <div class="card-header"><span class="card-title">🔥 Trending This Week</span></div>
+        ${[
+          ['1','AI-powered DevOps tools','↑ 340% search'],
+          ['2','Kubernetes cost optimization','↑ 210% search'],
+          ['3','LLM fine-tuning guides','↑ 190% search'],
+          ['4','Rust for backend systems','↑ 150% search'],
+          ['5','Zero-trust security arch','↑ 130% search'],
+        ].map(([n,t,s]) => `
+        <div class="flex items-center gap-12" style="padding:9px 0;border-bottom:1px solid var(--border);">
+          <span style="font-family:var(--font-head);font-size:15px;color:var(--text3);width:20px;">${n}</span>
+          <span style="flex:1;font-size:13px;">${t}</span>
+          <span style="font-size:11px;color:var(--green);background:rgba(16,185,129,0.1);padding:2px 7px;border-radius:20px;">${s}</span>
+        </div>`).join('')}
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Recommended Tools</span></div>
+        ${[
+          ['⚡','Linear','Modern project management for engineering teams','Productivity','https://linear.app'],
+          ['🤖','Cursor','AI-first code editor powered by Claude','Dev Tools','https://cursor.sh'],
+          ['📊','Grafana','Monitor everything in real-time dashboards','Observability','https://grafana.com'],
+        ].map(([icon,name,desc,cat,url]) => `
+        <div class="feed-item" style="padding:10px 0;cursor:pointer;" onclick="window.open('${url}','_blank')">
+          <div class="feed-icon" style="background:rgba(99,102,241,0.1);">${icon}</div>
+          <div class="feed-content">
+            <div class="feed-title" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color=''">${name} <span class="tag tag-blue" style="margin-left:4px;">${cat}</span></div>
+            <div style="font-size:11px;color:var(--text3);">${desc}</div>
+          </div>
+          <span style="color:var(--text3);font-size:18px;">›</span>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── SETTINGS ───
+function renderSettings() {
+  return `
+  <div style="margin-bottom:20px;">
+    <div style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:3px;">Settings</div>
+    <div style="color:var(--text3);font-size:13px;">Customize your TaskPilot experience</div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card mb-16" style="margin-bottom:18px;">
+        <div class="card-header"><span class="card-title">👤 Profile</span></div>
+        <div class="input-group">
+          <label class="input-label">Full Name</label>
+          <input class="input" id="set-name" value="${state.user.name}" type="text"/>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Job Title</label>
+          <input class="input" id="set-role" value="${state.user.role}" type="text"/>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Email</label>
+          <input class="input" value="arjun@company.com" type="email"/>
+        </div>
+        <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">🔔 Notifications</span></div>
+        ${[
+          ['Task Deadline Alerts','Notify 30 min before tasks are due',true],
+          ['Overcommitment Warnings','Alert when workload exceeds threshold',true],
+          ['AI Schedule Updates','Notify when AI regenerates your schedule',true],
+          ['Weekly Report','Send weekly productivity summary',false],
+          ['Intelligence Feed','Daily digest of tech news',false],
+        ].map(([t,d,on]) => `
+        <div class="flex items-center justify-between" style="padding:10px 0;border-bottom:1px solid var(--border);">
+          <div><div style="font-size:13px;font-weight:500;">${t}</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">${d}</div></div>
+          <div onclick="this.classList.toggle('active');this.style.background=this.classList.contains('active')?'var(--accent)':'var(--bg3)';" style="width:38px;height:22px;border-radius:11px;background:${on?'var(--accent)':'var(--bg3)'};border:1px solid var(--border);cursor:pointer;position:relative;transition:background 0.2s;" ${on?'class="active"':''}>
+            <div style="position:absolute;top:3px;left:${on?'18px':'3px'};width:14px;height:14px;border-radius:50%;background:#fff;transition:left 0.2s;"></div>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div>
+      <div class="card mb-16" style="margin-bottom:18px;">
+        <div class="card-header"><span class="card-title">⏱ Work Preferences</span></div>
+        ${state.workPrefs.saved ? `<div class="alert green" style="margin-bottom:12px;padding:8px 12px;"><span class="alert-icon">✅</span><div class="alert-content"><div class="alert-title" style="font-size:12px;">Preferences saved successfully!</div></div></div>` : ''}
+        <div class="input-group">
+          <label class="input-label">Work Start Time</label>
+          <input class="input" id="pref-start" type="time" value="${state.workPrefs.startTime}"/>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Work End Time</label>
+          <input class="input" id="pref-end" type="time" value="${state.workPrefs.endTime}"/>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Max Daily Tasks</label>
+          <select class="select" id="pref-maxtasks">
+            <option ${state.workPrefs.maxTasks==='5'?'selected':''}>5 tasks</option>
+            <option ${state.workPrefs.maxTasks==='8'||!state.workPrefs.maxTasks?'selected':''}>8 tasks</option>
+            <option ${state.workPrefs.maxTasks==='10'?'selected':''}>10 tasks</option>
+            <option ${state.workPrefs.maxTasks==='12'?'selected':''}>12 tasks</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Default Task Duration</label>
+          <select class="select" id="pref-duration">
+            <option value="30" ${state.workPrefs.defaultDuration==='30'?'selected':''}>30 minutes</option>
+            <option value="60" ${state.workPrefs.defaultDuration==='60'||!state.workPrefs.defaultDuration?'selected':''}>60 minutes</option>
+            <option value="90" ${state.workPrefs.defaultDuration==='90'?'selected':''}>90 minutes</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Timezone</label>
+          <select class="select" id="pref-tz">
+            <option ${state.workPrefs.timezone.includes('Kolkata')?'selected':''}>Asia/Kolkata (IST +5:30)</option>
+            <option ${state.workPrefs.timezone.includes('UTC')?'selected':''}>UTC (GMT +0)</option>
+            <option ${state.workPrefs.timezone.includes('New_York')?'selected':''}>America/New_York (EST -5)</option>
+            <option ${state.workPrefs.timezone.includes('London')?'selected':''}>Europe/London (GMT +1)</option>
+            <option ${state.workPrefs.timezone.includes('Singapore')?'selected':''}>Asia/Singapore (SGT +8)</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--border);margin-top:4px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:500;">Current Schedule</div>
+            <div style="font-size:11px;color:var(--text3);">Work day: ${state.workPrefs.startTime} – ${state.workPrefs.endTime} · Max ${state.workPrefs.maxTasks} tasks/day</div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveWorkPrefs()">💾 Save Preferences</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">🤖 AI Settings</span></div>
+        ${state.aiSettings.saved ? `<div class="alert green" style="margin-bottom:12px;padding:8px 12px;"><span class="alert-icon">✅</span><div class="alert-content"><div class="alert-title" style="font-size:12px;">AI settings saved!</div></div></div>` : ''}
+        <div class="input-group">
+          <label class="input-label">AI Scheduling Style</label>
+          <select class="select" id="ai-style">
+            <option ${state.aiSettings.style==='Deep Work First'?'selected':''}>Deep Work First</option>
+            <option ${state.aiSettings.style==='Meetings First'?'selected':''}>Meetings First</option>
+            <option ${state.aiSettings.style==='Balanced'?'selected':''}>Balanced</option>
+            <option ${state.aiSettings.style==='Custom'?'selected':''}>Custom</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Overload Threshold (hours/day)</label>
+          <select class="select" id="ai-threshold">
+            <option value="6" ${state.aiSettings.threshold==='6'?'selected':''}>6 hours/day</option>
+            <option value="8" ${state.aiSettings.threshold==='8'||!state.aiSettings.threshold?'selected':''}>8 hours/day</option>
+            <option value="10" ${state.aiSettings.threshold==='10'?'selected':''}>10 hours/day</option>
+          </select>
+        </div>
+        <div class="flex items-center justify-between" style="padding:10px 0;">
+          <div><div style="font-size:13px;font-weight:500;">Auto-generate daily schedule</div><div style="font-size:11px;color:var(--text3);">Runs every morning at ${state.workPrefs.startTime}</div></div>
+          <div id="autogen-toggle" onclick="toggleAiAutoGen()" style="width:38px;height:22px;border-radius:11px;background:${state.aiSettings.autoGen?'var(--accent)':'var(--bg3)'};border:1px solid var(--border);cursor:pointer;position:relative;transition:background 0.2s;">
+            <div style="position:absolute;top:3px;left:${state.aiSettings.autoGen?'18px':'3px'};width:14px;height:14px;border-radius:50%;background:#fff;transition:left 0.2s;"></div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveAiSettings()">💾 Save AI Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px;">
+    <div class="card-header"><span class="card-title">⚠️ Account Actions</span></div>
+    <div class="flex gap-12">
+      <button class="btn btn-secondary" onclick="exportData()">⬇ Export Data (JSON)</button>
+      <button class="btn btn-danger" onclick="if(confirm('Sign out?')){state.page='auth';render();}">Sign Out</button>
+    </div>
+  </div>`;
+}
+
+// ─── NOTIFICATION PANEL ───
+function renderNotifPanel() {
+  const unread = state.notifications.filter(n => n.unread).length;
+  return `
+  <div class="notif-panel ${state.notifOpen ? 'open' : ''}" id="notif-panel">
+    <div class="notif-panel-header">
+      <span style="font-family:var(--font-head);font-size:14px;font-weight:700;">Notifications</span>
+      <div class="flex items-center gap-8">
+        ${unread > 0 ? `<span class="nav-badge">${unread}</span>` : ''}
+        <span style="font-size:11px;color:var(--accent);cursor:pointer;" onclick="markAllRead()">Mark all read</span>
+      </div>
+    </div>
+    ${state.notifications.map(n => `
+    <div class="notif-item ${n.unread ? 'unread' : ''}">
+      <div class="notif-item-icon" style="background:${n.iconBg};">${n.icon}</div>
+      <div class="notif-item-body">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ─── ADD TASK MODAL ───
+function renderAddTaskModal() {
+  return `
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Add New Task</span>
+        <span class="modal-close" onclick="closeAddTask()">×</span>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Task Name *</label>
+        <input class="input" id="new-task-name" type="text" placeholder="e.g. Deploy to production server"/>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Category</label>
+        <select class="select" id="new-task-cat">
+          <option>Development</option><option>DevOps</option><option>Meeting</option>
+          <option>Review</option><option>Docs</option><option>Bug</option><option>Report</option><option>Research</option>
+        </select>
+      </div>
+      <div class="grid-2">
+        <div class="input-group">
+          <label class="input-label">Priority</label>
+          <select class="select" id="new-task-priority">
+            <option value="high">🔴 High</option>
+            <option value="medium" selected>🟡 Medium</option>
+            <option value="low">🟢 Low</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Estimated Duration</label>
+          <select class="select" id="new-task-dur">
+            <option value="15">15 min</option><option value="30">30 min</option>
+            <option value="45">45 min</option><option value="60" selected>1 hour</option>
+            <option value="90">1.5 hours</option><option value="120">2 hours</option><option value="180">3 hours</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Deadline *</label>
+        <input class="input" id="new-task-deadline" type="date" value="2025-04-22"/>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Notes (optional)</label>
+        <textarea class="textarea" id="new-task-notes" placeholder="Add any relevant details..."></textarea>
+      </div>
+      <div class="flex gap-12" style="margin-top:4px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="closeAddTask()">Cancel</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="addTask()">+ Add Task</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── EVENTS ───
+function attachEvents() {
+  // keyboard
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeAddTask();
+      closeNotif();
+    }
+  }, { once: true });
+}
+
+// ─── ACTIONS ───
+function navigate(page) {
+  state.page = page;
+  state.notifOpen = false;
+  render();
+}
+
+function toggleSidebar() {
+  const s = document.getElementById('sidebar');
+  if (s) s.classList.toggle('open');
+}
+
+function toggleNotif() {
+  state.notifOpen = !state.notifOpen;
+  render();
+}
+
+function closeNotif() {
+  state.notifOpen = false;
+  render();
+}
+
+function markAllRead() {
+  state.notifications.forEach(n => n.unread = false);
+  render();
+}
+
+function openAddTask() {
+  const modal = document.getElementById('modal-overlay');
+  if (modal) modal.classList.add('open');
+}
+
+function closeAddTask() {
+  const modal = document.getElementById('modal-overlay');
+  if (modal) modal.classList.remove('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeAddTask();
+}
+
+function addTask() {
+  const name = document.getElementById('new-task-name')?.value?.trim();
+  if (!name) { alert('Please enter a task name'); return; }
+  const task = {
+    id: Date.now(),
+    name,
+    category: document.getElementById('new-task-cat')?.value || 'Development',
+    priority: document.getElementById('new-task-priority')?.value || 'medium',
+    duration: parseInt(document.getElementById('new-task-dur')?.value || '60'),
+    deadline: document.getElementById('new-task-deadline')?.value || '2025-04-22',
+    done: false,
+  };
+  state.tasks.unshift(task);
+  closeAddTask();
+  render();
+}
+
+function toggleTask(id) {
+  const task = state.tasks.find(t => t.id === id);
+  if (task) task.done = !task.done;
+  render();
+}
+
+function deleteTask(e, id) {
+  e.stopPropagation();
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  render();
+}
+
+function saveProfile() {
+  const name = document.getElementById('set-name')?.value?.trim();
+  const role = document.getElementById('set-role')?.value?.trim();
+  if (name) state.user.name = name;
+  if (role) state.user.role = role;
+  state.user.initials = state.user.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  render();
+  alert('Profile saved!');
+}
+
+async function generateSchedule() {
+  if (state.aiLoading) return;
+  state.aiLoading = true;
+  state.aiInsight = '';
+  state.aiSchedule = [];
+  render();
+
+  const pendingTasks = state.tasks.filter(t => !t.done);
+  const taskList = pendingTasks.length > 0
+    ? pendingTasks.map(t => `- ${t.name} (${t.priority} priority, due ${t.deadline}, ~${t.duration} min, category: ${t.category})`).join('\n')
+    : '- No pending tasks. Create a sample schedule for a typical IT professional.';
+
+  const startTime = state.workPrefs.startTime || '09:00';
+  const endTime = state.workPrefs.endTime || '18:00';
+  const style = state.aiSettings.style || 'Deep Work First';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `You are an AI productivity coach for IT professionals. Create an optimized daily schedule. You MUST respond with ONLY a valid JSON object — no markdown fences, no explanation, no preamble. The exact format is:
+{"schedule":[{"time":"09:00","end":"10:00","name":"Task name","priority":"high","color":"#ef4444","cat":"Category"}],"insight":"2-3 sentence analysis"}
+Color rules: high priority red=#ef4444, medium yellow=#f59e0b, low green=#10b981, meetings=#f59e0b, devops/infra=#a78bfa, docs/review=#3b82f6, breaks=#5a6282`,
+        messages: [{ role: 'user', content: `Work hours: ${startTime} to ${endTime}. Scheduling style: ${style}. Tasks:\n${taskList}\n\nBuild a full day schedule with breaks and lunch. Put high priority in peak morning hours.` }]
+      })
+    });
+
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    const data = await res.json();
+    const text = (data.content || []).map(c => c.text || '').join('').trim();
+    // Strip any accidental markdown
+    const clean = text.replace(/^```[\w]*\n?/,'').replace(/\n?```$/,'').trim();
+    const parsed = JSON.parse(clean);
+    if (parsed.schedule && Array.isArray(parsed.schedule)) {
+      state.aiSchedule = parsed.schedule;
+      state.aiInsight = parsed.insight || '';
+    } else {
+      throw new Error('Invalid schedule format');
+    }
+  } catch (err) {
+    console.warn('AI schedule fallback:', err.message);
+    // Intelligent fallback using actual tasks
+    const pending = state.tasks.filter(t => !t.done).slice(0, 6);
+    const fallbackBlocks = [];
+    let cursor = state.workPrefs.startTime || '09:00';
+    const addMins = (t, m) => { const [h,min]=t.split(':').map(Number); const tot=h*60+min+m; return `${String(Math.floor(tot/60)).padStart(2,'0')}:${String(tot%60).padStart(2,'0')}`; };
+    // Morning: high priority tasks
+    const high = pending.filter(t=>t.priority==='high');
+    const med = pending.filter(t=>t.priority==='medium');
+    const low = pending.filter(t=>t.priority==='low');
+    [...high,...med,...low].forEach((t,i) => {
+      if (i===2) { fallbackBlocks.push({time:cursor,end:addMins(cursor,15),name:'Short Break',priority:'low',color:'#5a6282',cat:'Break'}); cursor=addMins(cursor,15); }
+      const end = addMins(cursor, t.duration||60);
+      fallbackBlocks.push({time:cursor,end,name:t.name,priority:t.priority,color:t.priority==='high'?'#ef4444':t.priority==='medium'?'#f59e0b':'#10b981',cat:t.category});
+      cursor=end;
+      if (cursor>='12:30'&&cursor<='13:00'&&!fallbackBlocks.find(b=>b.cat==='Lunch')) {
+        fallbackBlocks.push({time:cursor,end:addMins(cursor,60),name:'Lunch Break',priority:'low',color:'#10b981',cat:'Lunch'});
+        cursor=addMins(cursor,60);
+      }
+    });
+    if (!fallbackBlocks.find(b=>b.cat==='Lunch')) fallbackBlocks.push({time:'12:30',end:'13:30',name:'Lunch Break',priority:'low',color:'#10b981',cat:'Lunch'});
+    state.aiSchedule = fallbackBlocks.length ? fallbackBlocks : [
+      {time:startTime,end:addMins(startTime,45),name:'Code Review: Auth Module',priority:'high',color:'#ef4444',cat:'Review'},
+      {time:addMins(startTime,45),end:addMins(startTime,60),name:'Short Break',priority:'low',color:'#5a6282',cat:'Break'},
+      {time:addMins(startTime,60),end:addMins(startTime,120),name:'Fix Login Bug',priority:'high',color:'#ef4444',cat:'Bug Fix'},
+      {time:addMins(startTime,120),end:addMins(startTime,150),name:'Team Standup',priority:'medium',color:'#f59e0b',cat:'Meeting'},
+      {time:'12:30',end:'13:30',name:'Lunch Break',priority:'low',color:'#10b981',cat:'Lunch'},
+      {time:'13:30',end:'15:00',name:'K8s Deployment',priority:'high',color:'#a78bfa',cat:'DevOps'},
+      {time:'15:00',end:'17:00',name:'Quarterly Report Draft',priority:'low',color:'#22d3ee',cat:'Report'},
+    ];
+    state.aiInsight = `Schedule generated for ${pendingTasks.length} pending tasks using ${style} strategy. High-priority items are front-loaded in your ${startTime}–11:00 peak focus window. Remember to stay hydrated and take micro-breaks every 90 minutes for sustained performance. 💡`;
+  }
+
+  state.aiLoading = false;
+  state.scheduleGenerated = true;
+  state.scheduleBlockDone = {};
+  state.scheduleBlockRemoved = {};
+  render();
+}
+
+// ─── ALERT ACTIONS ───
+function dismissAlert(id) {
+  state.alertsDismissed.push(id);
+  render();
+}
+
+function openAlertAction(type) {
+  state.alertActions = { type };
+  render();
+  setTimeout(() => {
+    const el = document.querySelector('.card[style*="border-color"]');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 100);
+}
+
+function rescheduleTaskTo(id, newDate) {
+  const task = state.tasks.find(t => t.id === id);
+  if (task) task.deadline = newDate;
+}
+
+// ─── BLOCK ACTIONS ───
+function saveBlockEdits() {
+  const name = document.getElementById('bi-name')?.value?.trim();
+  const start = document.getElementById('bi-start')?.value;
+  const end = document.getElementById('bi-end')?.value;
+  const cat = document.getElementById('bi-cat')?.value;
+  const priority = document.getElementById('bi-priority')?.value;
+  const priorityColorMap = { high:'#ef4444', medium:'#f59e0b', low:'#10b981' };
+
+  if (state.selectedBlock) {
+    const oldName = state.selectedBlock.name;
+    if (name) state.selectedBlock.name = name;
+    if (start) state.selectedBlock.time = start;
+    if (end) state.selectedBlock.end = end;
+    if (cat) state.selectedBlock.cat = cat;
+    if (priority) {
+      state.selectedBlock.priority = priority;
+      state.selectedBlock.color = priorityColorMap[priority];
+    }
+    // Sync back into aiSchedule array
+    const idx = state.aiSchedule.findIndex(b => b.name === oldName);
+    if (idx !== -1) state.aiSchedule[idx] = { ...state.selectedBlock };
+    else {
+      // Block is from defaultBlocks — push edit into aiSchedule
+      const defaultBlocks = [
+        { time:'09:00', end:'09:45', name:'Code Review: Auth Module', priority:'high', color:'#ef4444', cat:'Review' },
+        { time:'09:45', end:'10:00', name:'Short Break', priority:'low', color:'#5a6282', cat:'Break' },
+        { time:'10:00', end:'11:00', name:'Fix Login Bug (Staging)', priority:'high', color:'#ef4444', cat:'Bug Fix' },
+        { time:'11:00', end:'11:30', name:'Team Standup', priority:'medium', color:'#f59e0b', cat:'Meeting' },
+        { time:'11:30', end:'12:30', name:'Deep Work: API Documentation', priority:'medium', color:'#3b82f6', cat:'Docs' },
+        { time:'12:30', end:'13:30', name:'Lunch Break', priority:'low', color:'#10b981', cat:'Break' },
+        { time:'13:30', end:'15:00', name:'K8s Deployment', priority:'high', color:'#a78bfa', cat:'DevOps' },
+        { time:'15:00', end:'17:00', name:'Quarterly Report Draft', priority:'low', color:'#22d3ee', cat:'Report' },
+      ];
+      state.aiSchedule = defaultBlocks.map(b => b.name === oldName ? { ...state.selectedBlock } : b);
+    }
+  }
+  state.selectedBlock = null;
+  render();
+}
+
+function markBlockDone(name) {
+  state.scheduleBlockDone[name] = true;
+  // Also mark matching task as done
+  const task = state.tasks.find(t => t.name.toLowerCase().includes(name.toLowerCase().slice(0,15)));
+  if (task) task.done = true;
+  render();
+}
+
+function removeBlock(name) {
+  state.scheduleBlockRemoved[name] = true;
+  if (state.aiSchedule.length) {
+    state.aiSchedule = state.aiSchedule.filter(b => b.name !== name);
+  }
+  state.selectedBlock = null;
+  render();
+}
+
+function setBlockReminder(time, name) {
+  state.alertActions = { msg: `⏰ Reminder set! You'll be notified 15 minutes before "${name}" at ${time}.` };
+  state.selectedBlock = null;
+  render();
+}
+
+function openRescheduleBlock() {
+  state.rescheduleBlock = state.selectedBlock;
+  state.selectedBlock = null;
+  render();
+}
+
+function startFocusTimer(name, time, durationMins) {
+  state.focusTimerBlock = { name, time, durationMins, startedAt: Date.now() };
+  state.selectedBlock = null;
+  render();
+}
+
+// ─── WORK PREFS SAVE ───
+function saveWorkPrefs() {
+  const start = document.getElementById('pref-start')?.value;
+  const end = document.getElementById('pref-end')?.value;
+  const maxTasks = document.getElementById('pref-maxtasks')?.value?.replace(/\D/g,'');
+  const duration = document.getElementById('pref-duration')?.value;
+  const tz = document.getElementById('pref-tz')?.value;
+  if (start) state.workPrefs.startTime = start;
+  if (end) state.workPrefs.endTime = end;
+  if (maxTasks) state.workPrefs.maxTasks = maxTasks;
+  if (duration) state.workPrefs.defaultDuration = duration;
+  if (tz) state.workPrefs.timezone = tz;
+  state.workPrefs.saved = true;
+  render();
+  setTimeout(() => { state.workPrefs.saved = false; }, 3000);
+}
+
+function saveAiSettings() {
+  const style = document.getElementById('ai-style')?.value;
+  const threshold = document.getElementById('ai-threshold')?.value?.replace(/\D/g,'');
+  if (style) state.aiSettings.style = style;
+  if (threshold) state.aiSettings.threshold = threshold;
+  state.aiSettings.saved = true;
+  render();
+  setTimeout(() => { state.aiSettings.saved = false; }, 3000);
+}
+
+function toggleAiAutoGen() {
+  state.aiSettings.autoGen = !state.aiSettings.autoGen;
+  render();
+}
+
+// ─── FEED DETAIL MODAL ───
+function renderFeedDetailModal() {
+  const feedItems = [
+    { icon:'🤖', bg:'rgba(99,102,241,0.12)', title:'GitHub Copilot adds AI-powered test generation in latest update', time:'2 hours ago', tag:'AI Tools', tagClass:'tag-purple', summary:'GitHub Copilot now automatically generates unit and integration tests as you write code. The feature uses context from your codebase to produce meaningful test cases, reducing test-writing time by up to 60%. Available for VS Code and JetBrains IDEs.', impact:'High', readTime:'3 min' },
+    { icon:'☸', bg:'rgba(59,130,246,0.12)', title:'Kubernetes 1.30 released with improved scheduling algorithms', time:'5 hours ago', tag:'DevOps', tagClass:'tag-blue', summary:'Kubernetes 1.30 "Uwubernetes" introduces smarter pod scheduling, reducing average scheduling latency by 40%. Key highlights include improved topology-aware routing, better resource allocation for GPU workloads, and enhanced security context constraints.', impact:'Medium', readTime:'5 min' },
+    { icon:'📊', bg:'rgba(16,185,129,0.12)', title:'Study: Developers using AI tools complete tasks 55% faster', time:'1 day ago', tag:'Productivity', tagClass:'tag-low', summary:'A new study by MIT CSAIL found that developers using AI coding assistants like Copilot and Cursor completed tasks 55% faster with no measurable quality drop. The gains were highest for boilerplate code, test generation, and documentation — exactly the tasks that eat into deep-work time.', impact:'High', readTime:'4 min' },
+    { icon:'🔐', bg:'rgba(245,158,11,0.12)', title:'Critical OpenSSL vulnerability — patch immediately', time:'1 day ago', tag:'Security', tagClass:'tag-medium', summary:'A critical memory corruption vulnerability (CVE-2025-1245) has been discovered in OpenSSL 3.x. Attackers can exploit this remotely without authentication. All systems running OpenSSL 3.0–3.3 should be patched to 3.4.1 immediately. Run: sudo apt update && sudo apt upgrade openssl', impact:'Critical', readTime:'2 min' },
+    { icon:'⚡', bg:'rgba(34,211,238,0.12)', title:'React 19 stable release: concurrent features now default', time:'2 days ago', tag:'Frontend', tagClass:'tag-blue', summary:'React 19 is now stable. Concurrent rendering, the new use() hook, Server Actions, and the improved compiler are now production-ready. The new compiler eliminates most need for useMemo and useCallback, reducing boilerplate significantly. Migration guide is available on react.dev.', impact:'Medium', readTime:'6 min' },
+    { icon:'🧠', bg:'rgba(239,68,68,0.12)', title:'Claude 3.5 API updates: improved code generation', time:'3 days ago', tag:'AI Tools', tagClass:'tag-purple', summary:'Anthropic released updates to the Claude API with major improvements to code generation accuracy, especially for complex multi-file refactors and debugging. The new claude-sonnet model scores 92% on HumanEval, up from 84%. Extended context window now supports up to 200K tokens.', impact:'High', readTime:'4 min' },
+    { icon:'📈', bg:'rgba(59,130,246,0.12)', title:'IT job market: DevOps salaries up 18% YoY in India', time:'3 days ago', tag:'Career', tagClass:'tag-low', summary:'According to the 2025 India Tech Salary Report, DevOps engineers saw the highest salary growth at 18% YoY, followed by ML engineers (15%) and platform engineers (13%). Average DevOps salary in Bangalore/Hyderabad is now ₹22–35 LPA for 3–6 years of experience.', impact:'Medium', readTime:'3 min' },
+    { icon:'🐳', bg:'rgba(59,130,246,0.1)', title:'Docker Desktop 4.30 — Kubernetes integration overhaul', time:'4 days ago', tag:'DevOps', tagClass:'tag-blue', summary:'Docker Desktop 4.30 ships with a completely revamped Kubernetes integration that eliminates the previous 2–3 minute startup delay. The new built-in cluster mirrors your production K8s config, making local development and staging environments nearly identical. Also includes a new resource usage dashboard.', impact:'Medium', readTime:'4 min' },
+  ];
+  const item = feedItems[state.selectedFeed];
+  if (item === undefined || state.selectedFeed === null) {
+    return `<div id="feed-detail-overlay" class="modal-overlay" onclick="closeFeedModal()"><div class="detail-modal"></div></div>`;
+  }
+  const impactColors = { Critical:'var(--red)', High:'var(--yellow)', Medium:'var(--accent)', Low:'var(--green)' };
+  return `
+  <div id="feed-detail-overlay" class="modal-overlay open" onclick="closeFeedModal()">
+    <div class="detail-modal" onclick="event.stopPropagation()" style="width:560px;">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="feed-icon" style="background:${item.bg};width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${item.icon}</div>
+          <div>
+            <div style="font-size:11px;margin-bottom:4px;display:flex;gap:6px;align-items:center;">
+              <span class="tag ${item.tagClass}">${item.tag}</span>
+              <span style="color:var(--text3);">${item.time}</span>
+              <span style="color:var(--text3);">· ${item.readTime} read</span>
+            </div>
+          </div>
+        </div>
+        <span class="modal-close" onclick="closeFeedModal()">×</span>
+      </div>
+      <div style="font-family:var(--font-head);font-size:16px;font-weight:700;line-height:1.4;margin-bottom:16px;">${item.title}</div>
+      <div class="detail-row" style="margin-bottom:14px;">
+        <span class="detail-row-label">Impact Level</span>
+        <span style="font-weight:600;color:${impactColors[item.impact]||'var(--accent)'};">● ${item.impact}</span>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">Summary</div>
+        <div style="font-size:14px;line-height:1.7;color:var(--text2);background:var(--bg3);padding:14px;border-radius:var(--radius-sm);">${item.summary}</div>
+      </div>
+      <div class="ai-response" style="margin-bottom:16px;">
+        <div class="ai-label"><div class="ai-dot"></div>TaskPilot AI — How this affects your work</div>
+        <div class="ai-text" style="font-size:13px;">${getAITakeOnFeed(item.tag, item.title)}</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="closeFeedModal()">Close</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="closeFeedModal();navigate('tasks')">+ Add to My Tasks</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function getAITakeOnFeed(tag, title) {
+  if (tag === 'Security') return '🔐 This is a critical security update. I recommend adding a task to your list right now: "Patch OpenSSL on all servers". Treat this as high-priority, deadline today.';
+  if (tag === 'AI Tools') return '🤖 This AI tool update could save you 1–2 hours per week on code reviews and test writing. Worth exploring this sprint.';
+  if (tag === 'DevOps') return '☸ Staying current with Kubernetes and Docker updates directly impacts your deployment reliability. Consider scheduling a 30-min learning block this week.';
+  if (tag === 'Frontend') return '⚡ React 19 migration could reduce your bundle size and remove unnecessary memoization hooks. A medium-priority refactor to plan for Q3.';
+  if (tag === 'Career') return '📈 Market data like this is useful for performance reviews. Consider tracking your DevOps contributions to leverage during salary conversations.';
+  if (tag === 'Productivity') return '📊 If you\'re not yet using an AI coding assistant, this study suggests it\'s worth the 1-hour setup investment. Could recover 3–4 hours per week.';
+  return '💡 This update is relevant to your tech stack. Consider scheduling a short research block to evaluate how it applies to your current projects.';
+}
+
+function openFeedItem(idx) {
+  state.selectedFeed = idx;
+  render();
+}
+
+function closeFeedModal() {
+  state.selectedFeed = null;
+  render();
+}
+
+// ─── RESCHEDULE MODAL ───
+function renderRescheduleModal() {
+  if (!state.rescheduleBlock) return `<div id="reschedule-overlay" class="modal-overlay"></div>`;
+  const b = state.rescheduleBlock;
+  return `
+  <div id="reschedule-overlay" class="modal-overlay open" onclick="event.target===this&&closeRescheduleModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">📅 Reschedule Block</span>
+        <span class="modal-close" onclick="closeRescheduleModal()">×</span>
+      </div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Rescheduling: <strong>${b.name}</strong> (currently ${b.time}–${b.end})</div>
+      <div class="input-group">
+        <label class="input-label">New Start Time</label>
+        <input class="input" id="rs-start" type="time" value="${b.time}"/>
+      </div>
+      <div class="input-group">
+        <label class="input-label">New End Time</label>
+        <input class="input" id="rs-end" type="time" value="${b.end}"/>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Move to Date</label>
+        <input class="input" id="rs-date" type="date" value="${new Date().toISOString().split('T')[0]}"/>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Reason (optional)</label>
+        <select class="select" id="rs-reason">
+          <option>Conflict with another meeting</option>
+          <option>Need more prep time</option>
+          <option>Dependency not ready</option>
+          <option>Reprioritized</option>
+          <option>Personal reason</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="closeRescheduleModal()">Cancel</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="confirmReschedule()">✅ Confirm Reschedule</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function closeRescheduleModal() {
+  state.rescheduleBlock = null;
+  render();
+}
+
+function confirmReschedule() {
+  const start = document.getElementById('rs-start')?.value;
+  const end = document.getElementById('rs-end')?.value;
+  if (state.rescheduleBlock && start && end) {
+    const b = state.rescheduleBlock;
+    const idx = state.aiSchedule.findIndex(s => s.name === b.name);
+    if (idx !== -1) { state.aiSchedule[idx].time = start; state.aiSchedule[idx].end = end; }
+    state.alertActions = { msg: `"${b.name}" rescheduled to ${start}–${end} successfully!` };
+  }
+  state.rescheduleBlock = null;
+  render();
+}
+
+// ─── FOCUS TIMER MODAL ───
+function renderFocusTimerModal() {
+  if (!state.focusTimerBlock) return `<div id="timer-overlay" class="modal-overlay"></div>`;
+  const b = state.focusTimerBlock;
+  const elapsed = Math.floor((Date.now() - b.startedAt) / 1000);
+  const remaining = Math.max(0, b.durationMins * 60 - elapsed);
+  const mins = Math.floor(remaining / 60);
+  const secs = remaining % 60;
+  const pct = Math.round((1 - remaining / (b.durationMins * 60)) * 100);
+  // Auto-refresh every second
+  if (remaining > 0) setTimeout(() => { if (state.focusTimerBlock) render(); }, 1000);
+  return `
+  <div id="timer-overlay" class="modal-overlay open" onclick="event.target===this&&stopFocusTimer()">
+    <div class="modal" style="text-align:center;max-width:360px;" onclick="event.stopPropagation()">
+      <div class="modal-header" style="justify-content:center;position:relative;">
+        <span class="modal-title">▶ Focus Timer</span>
+        <span class="modal-close" style="position:absolute;right:0;" onclick="stopFocusTimer()">×</span>
+      </div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:20px;">${b.name}</div>
+      <div style="position:relative;width:140px;height:140px;margin:0 auto 20px;">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="60" fill="none" stroke="var(--border)" stroke-width="8"/>
+          <circle cx="70" cy="70" r="60" fill="none" stroke="var(--accent)" stroke-width="8"
+            stroke-dasharray="${2*Math.PI*60}" stroke-dashoffset="${2*Math.PI*60*(1-pct/100)}"
+            transform="rotate(-90 70 70)" style="transition:stroke-dashoffset 0.9s;"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="font-family:var(--font-head);font-size:32px;font-weight:800;">${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}</div>
+          <div style="font-size:11px;color:var(--text3);">${remaining>0?'remaining':'Done!'}</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">${pct}% complete · ${b.durationMins} min session</div>
+      ${remaining === 0 ? `
+      <div class="alert green" style="margin-bottom:16px;text-align:left;">
+        <span class="alert-icon">🎉</span>
+        <div class="alert-content"><div class="alert-title">Focus session complete!</div><div class="alert-desc">Great work! Take a 5-minute break.</div></div>
+      </div>` : ''}
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-danger" style="flex:1;" onclick="stopFocusTimer()">⏹ Stop</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="markBlockDone('${b.name}');stopFocusTimer()">✅ Mark Done</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function stopFocusTimer() {
+  state.focusTimerBlock = null;
+  render();
+}
+
+
+
+function getTimeOfDay() {
+  const h = new Date().getHours();
+  if (h < 12) return 'morning';
+  if (h < 17) return 'afternoon';
+  return 'evening';
+}
+
+// ─── BLOCK DETAIL MODAL ───
+function renderBlockDetailModal() {
+  const b = state.selectedBlock;
+  if (!b) return `<div id="block-detail-overlay" class="modal-overlay" onclick="closeDetailModal('block-detail-overlay')"><div class="detail-modal"></div></div>`;
+
+  const durationMins = (() => {
+    const [sh, sm] = b.time.split(':').map(Number);
+    const [eh, em] = b.end.split(':').map(Number);
+    return (eh * 60 + em) - (sh * 60 + sm);
+  })();
+
+  const tips = {
+    'Review': '💡 Schedule code reviews in the morning when your attention to detail is sharpest.',
+    'Bug Fix': '🔍 Isolate the bug first before jumping into code changes.',
+    'Meeting': '📌 Keep a notepad ready and note action items before the call ends.',
+    'Docs': '✍️ Write docs right after the task while context is fresh.',
+    'DevOps': '⚙️ Double-check rollback procedures before deploying to production.',
+    'Report': '📊 Pull data first, then structure. Avoid writing and researching simultaneously.',
+    'Break': '🧘 Step away from the screen. A real break boosts the next focus block by 25%.',
+  };
+
+  return `
+  <div id="block-detail-overlay" class="modal-overlay open" onclick="closeDetailModal('block-detail-overlay')">
+    <div class="detail-modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <div style="width:12px;height:12px;border-radius:3px;background:${b.color};flex-shrink:0;"></div>
+            <span class="modal-title">${b.name}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text3);">${b.time} → ${b.end} &nbsp;·&nbsp; ${durationMins} minutes</div>
+        </div>
+        <span class="modal-close" onclick="closeDetailModal('block-detail-overlay')">×</span>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Block Info</div>
+        <div class="input-group">
+          <label class="input-label">📝 Block Name</label>
+          <input class="input" id="bi-name" type="text" value="${b.name}"/>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="input-group">
+            <label class="input-label">⏰ Start Time</label>
+            <input class="input" id="bi-start" type="time" value="${b.time}"/>
+          </div>
+          <div class="input-group">
+            <label class="input-label">⏰ End Time</label>
+            <input class="input" id="bi-end" type="time" value="${b.end}"/>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="input-group">
+            <label class="input-label">📂 Category</label>
+            <select class="select" id="bi-cat">
+              ${['Review','Bug Fix','Meeting','Docs','DevOps','Report','Break','Lunch','Research','Development'].map(c=>`<option ${b.cat===c?'selected':''}>${c}</option>`).join('')}
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label">🔥 Priority</label>
+            <select class="select" id="bi-priority">
+              <option value="high" ${b.priority==='high'?'selected':''}>🔴 High</option>
+              <option value="medium" ${b.priority==='medium'?'selected':''}>🟡 Medium</option>
+              <option value="low" ${b.priority==='low'?'selected':''}>🟢 Low</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveBlockEdits()">💾 Save Block Info</button>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">AI Tip for this Block</div>
+        <div class="ai-response">
+          <div class="ai-label"><div class="ai-dot"></div>TaskPilot AI</div>
+          <div class="ai-text">${tips[b.cat] || '🤖 Stay focused and minimize distractions during this block for best results.'}</div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Quick Actions</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-secondary btn-sm" onclick="openRescheduleBlock()">📅 Reschedule</button>
+          <button class="btn btn-secondary btn-sm" onclick="setBlockReminder('${b.time}','${b.name}')">🔔 Set Reminder</button>
+          <button class="btn ${state.scheduleBlockDone[b.name]?'btn-primary':'btn-secondary'} btn-sm" onclick="markBlockDone('${b.name}')">
+            ${state.scheduleBlockDone[b.name]?'✅ Done!':'✅ Mark Done'}
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="removeBlock('${b.name}')">🗑 Remove Block</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="closeDetailModal('block-detail-overlay')">Close</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="startFocusTimer('${b.name}','${b.time}',${durationMins})">▶ Start Focus Timer</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── TASK DETAIL MODAL ───
+function renderTaskDetailModal() {
+  const t = state.selectedTask;
+  if (!t) return `<div id="task-detail-overlay" class="modal-overlay" onclick="closeDetailModal('task-detail-overlay')"><div class="detail-modal"></div></div>`;
+
+  const today = new Date().toISOString().split('T')[0];
+  const isOverdue = !t.done && t.deadline < today;
+  const statusClass = t.done ? 'status-done' : isOverdue ? 'status-overdue' : 'status-pending';
+  const statusLabel = t.done ? '✅ Completed' : isOverdue ? '🔴 Overdue' : '🟡 Pending';
+
+  return `
+  <div id="task-detail-overlay" class="modal-overlay open" onclick="closeDetailModal('task-detail-overlay')">
+    <div class="detail-modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <div class="priority-dot ${t.priority}" style="width:10px;height:10px;flex-shrink:0;margin-top:0;"></div>
+            <span class="modal-title" style="font-size:16px;">${t.name}</span>
+          </div>
+          <span class="status-badge ${statusClass}">${statusLabel}</span>
+        </div>
+        <span class="modal-close" onclick="closeDetailModal('task-detail-overlay')">×</span>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Task Details</div>
+        <div class="detail-row">
+          <span class="detail-row-label">📂 Category</span>
+          <span class="detail-row-value">${t.category}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-row-label">🔥 Priority</span>
+          <span class="tag ${t.priority==='high'?'tag-high':t.priority==='medium'?'tag-medium':'tag-low'}">${t.priority}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-row-label">📅 Deadline</span>
+          <span class="detail-row-value" style="color:${isOverdue?'var(--red)':'inherit'}">${t.deadline} ${isOverdue?'⚠️ Overdue':''}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-row-label">⏱ Duration</span>
+          <span class="detail-row-value">${t.duration} minutes</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Edit Task</div>
+        <div class="input-group">
+          <label class="input-label">Task Name</label>
+          <input class="input" id="edit-task-name" type="text" value="${t.name}"/>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="input-group">
+            <label class="input-label">Priority</label>
+            <select class="select" id="edit-task-priority">
+              <option value="high" ${t.priority==='high'?'selected':''}>🔴 High</option>
+              <option value="medium" ${t.priority==='medium'?'selected':''}>🟡 Medium</option>
+              <option value="low" ${t.priority==='low'?'selected':''}>🟢 Low</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Deadline</label>
+            <input class="input" id="edit-task-deadline" type="date" value="${t.deadline}"/>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Notes</label>
+          <textarea class="textarea" id="edit-task-notes" placeholder="Add notes...">${t.notes||''}</textarea>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+        <button class="btn btn-secondary btn-sm" onclick="toggleTaskFromDetail(${t.id})">${t.done ? '↩ Mark Pending' : '✅ Mark Complete'}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteTaskFromDetail(${t.id})">🗑 Delete Task</button>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="closeDetailModal('task-detail-overlay')">Cancel</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="saveTaskEdits(${t.id})">💾 Save Changes</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── DETAIL MODAL ACTIONS ───
+function openBlock(idx) {
+  const defaultBlocks = [
+    { time:'09:00', end:'09:45', name:'Code Review: Auth Module', priority:'high', color:'var(--red)', cat:'Review' },
+    { time:'09:45', end:'10:00', name:'Short Break', priority:'low', color:'var(--text3)', cat:'Break' },
+    { time:'10:00', end:'11:00', name:'Fix Login Bug (Staging)', priority:'high', color:'var(--red)', cat:'Bug Fix' },
+    { time:'11:00', end:'11:30', name:'Team Standup', priority:'medium', color:'var(--yellow)', cat:'Meeting' },
+    { time:'11:30', end:'12:30', name:'Deep Work: API Documentation', priority:'medium', color:'var(--accent)', cat:'Docs' },
+    { time:'12:30', end:'13:30', name:'Lunch Break', priority:'low', color:'var(--green)', cat:'Break' },
+    { time:'13:30', end:'15:00', name:'K8s Deployment', priority:'high', color:'var(--purple)', cat:'DevOps' },
+    { time:'15:00', end:'17:00', name:'Quarterly Report Draft', priority:'low', color:'var(--accent3)', cat:'Report' },
+  ];
+  const blocks = state.aiSchedule.length ? state.aiSchedule : defaultBlocks;
+  state.selectedBlock = blocks[idx];
+  render();
+}
+
+function openTaskDetail(id) {
+  state.selectedTask = state.tasks.find(t => t.id === id) || null;
+  render();
+}
+
+function closeDetailModal(id) {
+  if (id === 'block-detail-overlay') state.selectedBlock = null;
+  if (id === 'task-detail-overlay') state.selectedTask = null;
+  render();
+}
+
+function toggleTaskFromDetail(id) {
+  const task = state.tasks.find(t => t.id === id);
+  if (task) { task.done = !task.done; state.selectedTask = task; }
+  render();
+}
+
+function deleteTaskFromDetail(id) {
+  if (!confirm('Delete this task?')) return;
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  state.selectedTask = null;
+  render();
+}
+
+function saveTaskEdits(id) {
+  const task = state.tasks.find(t => t.id === id);
+  if (!task) return;
+  const name = document.getElementById('edit-task-name')?.value?.trim();
+  const priority = document.getElementById('edit-task-priority')?.value;
+  const deadline = document.getElementById('edit-task-deadline')?.value;
+  const notes = document.getElementById('edit-task-notes')?.value;
+  if (name) task.name = name;
+  if (priority) task.priority = priority;
+  if (deadline) task.deadline = deadline;
+  task.notes = notes;
+  state.selectedTask = null;
+  render();
+}
+
+function exportData() {
+  const data = { user: state.user, tasks: state.tasks, workPrefs: state.workPrefs, aiSettings: state.aiSettings, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'taskpilot-export.json';
+  a.click();
+}
+
+render();
+</script>
+</body>
+</html>
